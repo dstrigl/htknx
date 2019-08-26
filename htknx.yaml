@@ -1,0 +1,19 @@
+general:
+  own_address: '15.15.250'
+  rate_limit: 20
+  publish_interval:
+    milliseconds: 5000
+
+connection:
+  local_ip: '192.168.11.150'
+  gateway_ip: '192.168.11.81'
+  gateway_port: 3671
+
+data_points:
+  - name: 'HKR Soll_Raum'
+    data_type: 'temperature'  # 'DPT-9'
+    group_address: '1/1/1'
+    writable: true
+  - name: 'Stoerung'
+    data_type: 'binary'
+    group_address: '1/1/2'
