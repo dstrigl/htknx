@@ -62,16 +62,20 @@ class HtHeatpumpParam(Device):
         """ Return group addresses which should be requested to sync state. """
         return []  # not needed!
 
-    async def process_group_read(self, telegram):
-        """ Process incoming GROUP READ telegram. """
-        self.xknx.logger.info("HtHeatpumpParam.process_group_read: {!s}".format(telegram))
+    async def broadcast_value(self, response):
+        """ Broadcast parameter value to KNX bus. """
         # TODO query value, try/except
         value = 123
         #value = ht_heatpump.get_param(self.name)
-        self.xknx.logger.info("HtHeatpumpParam.process_group_read: ht_heatpump.get_param({!r}) -> {}".format(
+        self.xknx.logger.info("HtHeatpumpParam.broadcast_value: ht_heatpump.get_param({!r}) -> {}".format(
             self.name, value))
         self.param_value.payload = self.param_value.to_knx(value)
-        await self.param_value.send(response=True)
+        await self.param_value.send(response=response)
+
+    async def process_group_read(self, telegram):
+        """ Process incoming GROUP READ telegram. """
+        self.xknx.logger.info("HtHeatpumpParam.process_group_read: {!s}".format(telegram))
+        await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """ Process incoming GROUP WRITE telegram. """
@@ -89,9 +93,13 @@ class HtHeatpumpParam(Device):
             #value = ht_heatpump.set_param(self.name, value)
             self.param_value.payload = self.param_value.to_knx(value)
 
-    async def set(self, value):
-        """ Set new value. """
-        await self.param_value.set(value)
+    #async def set(self, value):
+    #    """ Set new value. """
+    #    await self.param_value.set(value)
+
+    async def sync(self, wait_for_result=True):
+        """ Read state of device from KNX bus. Used here to broadcast parameter value to KNX bus. """
+        await self.broadcast_value(False)
 
     def unit_of_measurement(self):
         """ Return the unit of measurement. """
