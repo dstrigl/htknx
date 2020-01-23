@@ -139,3 +139,10 @@ def boolean(value: Any) -> bool:
     elif isinstance(value, Number):
         return value != 0
     raise vol.Invalid("invalid boolean value {!r}".format(value))
+
+
+def number(value: Any) -> Union[int, float]:
+    """ Validate numeric value. """
+    if type(value) in (int, float):
+        return value
+    raise vol.Invalid("invalid numeric value {!r}".format(value))
