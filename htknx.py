@@ -20,18 +20,14 @@
 """ TODO """
 
 import asyncio
+import logging
 
-
-
-
-
-
+_LOGGER = logging.getLogger(__name__)
 
 
 async def main():
     pass
 
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-loop.close()
+if __name__ == "__main__":
+    asyncio.run(main())

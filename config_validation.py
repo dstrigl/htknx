@@ -17,59 +17,65 @@ port = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
 # https://github.com/alecthomas/voluptuous/issues/115#issuecomment-144464666
 def has_at_least_one_key(*keys: str) -> Callable:
     """ Validate that at least one key exists. """
+
     def validate(obj: Dict) -> Dict:
         """ Test keys exist in dict. """
         if not isinstance(obj, dict):
             raise vol.Invalid("expected dictionary")
 
-        for k in obj.keys():
+        for k in obj:
             if k in keys:
                 return obj
-        raise vol.Invalid("must contain one of {!r}.".format(", ".join(keys)))
+        raise vol.Invalid("must contain at least one of {}.".format(", ".join(keys)))
 
     return validate
 
 
 time_period_dict = vol.All(
-    dict, vol.Schema({
-        "days": vol.Coerce(int),
-        "hours": vol.Coerce(int),
-        "minutes": vol.Coerce(int),
-        "seconds": vol.Coerce(int),
-        "milliseconds": vol.Coerce(int),
-    }),
-    has_at_least_one_key("days", "hours", "minutes", "seconds", "milliseconds"), lambda value: timedelta(**value))
+    dict,
+    vol.Schema(
+        {
+            "days": vol.Coerce(float),
+            "hours": vol.Coerce(float),
+            "minutes": vol.Coerce(float),
+            "seconds": vol.Coerce(float),
+            "milliseconds": vol.Coerce(float),
+        }
+    ),
+    has_at_least_one_key("days", "hours", "minutes", "seconds", "milliseconds"),
+    lambda value: timedelta(**value),
+)
 
 
-TIME_PERIOD_ERROR = "offset {!r} should be format 'HH:MM' or 'HH:MM:SS'"
+TIME_PERIOD_ERROR = "offset {} should be format 'HH:MM', 'HH:MM:SS' or 'HH:MM:SS.F'"
 
 
 def time_period_str(value: str) -> timedelta:
     """ Validate and transform time offset. """
-    if isinstance(value, int):
-        raise vol.Invalid("Make sure you wrap time values in quotes")
+    if isinstance(value, int):  # type: ignore
+        raise vol.Invalid("make sure you wrap time values in quotes")
     if not isinstance(value, str):
         raise vol.Invalid(TIME_PERIOD_ERROR.format(value))
 
     negative_offset = False
-    if value.startswith('-'):
+    if value.startswith("-"):
         negative_offset = True
         value = value[1:]
-    elif value.startswith('+'):
+    elif value.startswith("+"):
         value = value[1:]
 
+    parsed = value.split(":")
+    if len(parsed) not in (2, 3):
+        raise vol.Invalid(TIME_PERIOD_ERROR.format(value))
     try:
-        parsed = [int(x) for x in value.split(':')]
-    except ValueError:
-        raise vol.Invalid(TIME_PERIOD_ERROR.format(value))
-
-    if len(parsed) == 2:
-        hour, minute = parsed
-        second = 0
-    elif len(parsed) == 3:
-        hour, minute, second = parsed
-    else:
-        raise vol.Invalid(TIME_PERIOD_ERROR.format(value))
+        hour = int(parsed[0])
+        minute = int(parsed[1])
+        try:
+            second = float(parsed[2])
+        except IndexError:
+            second = 0
+    except ValueError as err:
+        raise vol.Invalid(TIME_PERIOD_ERROR.format(value)) from err
 
     offset = timedelta(hours=hour, minutes=minute, seconds=second)
 
@@ -79,12 +85,12 @@ def time_period_str(value: str) -> timedelta:
     return offset
 
 
-def time_period_seconds(value: Union[int, str]) -> timedelta:
+def time_period_seconds(value: Union[float, str]) -> timedelta:
     """ Validate and transform seconds to a time offset. """
     try:
-        return timedelta(seconds=int(value))
-    except (ValueError, TypeError):
-        raise vol.Invalid("expected seconds, got {!r}".format(value))
+        return timedelta(seconds=float(value))
+    except (ValueError, TypeError) as err:
+        raise vol.Invalid(f"expected seconds, got {value}") from err
 
 
 time_period = vol.Any(time_period_str, time_period_seconds, timedelta, time_period_dict)
@@ -104,25 +110,29 @@ def string(value: Any) -> str:
     """ Coerce value to string, except for None. """
     if value is None:
         raise vol.Invalid("string value is None")
+
     if isinstance(value, (list, dict)):
         raise vol.Invalid("value should be a string")
+
     return str(value)
 
 
-def matches_regex(regex):
+def matches_regex(regex: str) -> Callable[[Any], str]:
     """ Validate that the value is a string that matches a regex. """
-    regex = re.compile(regex)
+    compiled = re.compile(regex)
 
     def validator(value: Any) -> str:
         """ Validate that value matches the given regex. """
         if not isinstance(value, str):
-            raise vol.Invalid("not a string value {!r}".format(value))
+            raise vol.Invalid(f"not a string value: {value}")
 
-        if not regex.match(value):
-            raise vol.Invalid("value {!r} does not match regular expression {!r}"
-                              .format(value, regex.pattern))
+        if not compiled.match(value):
+            raise vol.Invalid(
+                f"value {value} does not match regular expression {compiled.pattern}"
+            )
 
         return value
+
     return validator
 
 
@@ -137,12 +147,13 @@ def boolean(value: Any) -> bool:
         if value in ("0", "false", "no", "off", "disable"):
             return False
     elif isinstance(value, Number):
-        return value != 0
-    raise vol.Invalid("invalid boolean value {!r}".format(value))
+        # type ignore: https://github.com/python/mypy/issues/3186
+        return value != 0  # type: ignore
+    raise vol.Invalid(f"invalid boolean value {value}")
 
 
 def number(value: Any) -> Union[int, float]:
     """ Validate numeric value. """
     if type(value) in (int, float):
         return value
-    raise vol.Invalid("invalid numeric value {!r}".format(value))
+    raise vol.Invalid(f"invalid numeric value {value}")

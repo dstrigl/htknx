@@ -22,7 +22,7 @@
 import yaml
 import voluptuous as vol
 import config_validation as cv
-from xknx.knx import PhysicalAddress
+from xknx.telegram import PhysicalAddress
 from htheatpump.htparams import HtParams
 
 import logging
@@ -46,6 +46,7 @@ CONF_WRITABLE = "writable"
 CONF_CYCLIC_SENDING = "cyclic_sending"
 CONF_SEND_ON_CHANGE = "send_on_change"
 CONF_ON_CHANGE_OF = "on_change_of"
+# TODO on_change_of_relative / on_change_of_absolute
 
 KNX_GA_REGEX = "^(3[0-1]|[1-2]\d|\d)/([0-7])/(2[0-5][0-5]|1\d\d|[1-9]?[0-9])$"  # valid GA: [0-31]/[0-7]/[0-255]
 KNX_PA_REGEX = "^(1[0-5]|\d)\.(1[0-5]|\d)\.(2[0-5][0-5]|1\d\d|[1-9]?[0-9])$"  # valid PA: [0-15].[0-15].[0-255]  # TODO
@@ -66,7 +67,7 @@ CONNECTION_SCHEMA = vol.Schema({
 
 DATA_POINT_SCHEMA = vol.Schema({
     vol.Required(CONF_NAME): vol.All(cv.string, vol.In(HtParams.keys())),
-    vol.Required(CONF_DATA_TYPE): cv.string,  # TODO validate
+    vol.Required(CONF_DATA_TYPE): cv.string,  # TODO validate!
     vol.Required(CONF_GROUP_ADDRESS): cv.matches_regex(KNX_GA_REGEX),
     vol.Optional(CONF_WRITABLE): cv.boolean,
     vol.Optional(CONF_CYCLIC_SENDING): cv.boolean,
