@@ -66,7 +66,7 @@ class HtHeatpumpParam(Device):
             writable=writable,
         )
 
-    async def broadcast_value(self, response):
+    async def broadcast_value(self, response=False):
         """ Broadcast parameter value to KNX bus. """
         # TODO query value, try/except
         value = 123
