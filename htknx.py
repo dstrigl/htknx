@@ -25,6 +25,9 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 
+# TODO HtParamCache (performs the write and the cyclic update; stores the values in a dict)
+
+
 async def main():
     pass
 

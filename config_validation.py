@@ -4,10 +4,21 @@
 """ Helpers for config validation using voluptuous. """
 
 from datetime import timedelta
-from typing import Any, Union, Callable, Dict
 from numbers import Number
+from re import compile as re_compile
+from typing import Any, Callable, Dict, List, TypeVar, Union
+
 import voluptuous as vol
-import re
+
+# typing typevar
+T = TypeVar("T")
+
+
+KNX_GA_MAX_FREE = 65535
+KNX_GA_REGEX = re_compile(
+    r"^(?P<main>\d{1,2})(/(?P<middle>\d{1,2}))?/(?P<sub>\d{1,4})$"
+)
+KNX_PA_REGEX = re_compile(r"^(?P<area>\d{1,2})\.(?P<main>\d{1,2})\.(?P<line>\d{1,3})$")
 
 
 port = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
@@ -117,25 +128,6 @@ def string(value: Any) -> str:
     return str(value)
 
 
-def matches_regex(regex: str) -> Callable[[Any], str]:
-    """ Validate that the value is a string that matches a regex. """
-    compiled = re.compile(regex)
-
-    def validator(value: Any) -> str:
-        """ Validate that value matches the given regex. """
-        if not isinstance(value, str):
-            raise vol.Invalid(f"not a string value: {value}")
-
-        if not compiled.match(value):
-            raise vol.Invalid(
-                f"value {value} does not match regular expression {compiled.pattern}"
-            )
-
-        return value
-
-    return validator
-
-
 def boolean(value: Any) -> bool:
     """ Validate and coerce a boolean value. """
     if isinstance(value, bool):
@@ -157,3 +149,31 @@ def number(value: Any) -> Union[int, float]:
     if type(value) in (int, float):
         return value
     raise vol.Invalid(f"invalid numeric value {value}")
+
+
+def ensure_list(value: Union[T, List[T], None]) -> List[T]:
+    """ Wrap value in list if it is not one. """
+    if value is None:
+        return []
+    return value if isinstance(value, list) else [value]
+
+
+def ensure_group_address(value: str) -> str:
+    """ Ensure value is a valid KNX group address. """
+    value = str(value)
+    if value.isdigit() and 0 <= int(value) <= KNX_GA_MAX_FREE:
+        return value
+
+    if not KNX_GA_REGEX.match(value):
+        raise vol.Invalid(f"{value} is not a valid group address")
+
+    return value
+
+
+def ensure_physical_address(value: str) -> str:
+    """ Ensure value is a valid physical address. """
+    value = str(value)
+    if not KNX_PA_REGEX.match(value):
+        raise vol.Invalid(f"{value} is not a valid physical address")
+
+    return value

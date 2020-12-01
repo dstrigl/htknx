@@ -1,27 +1,31 @@
 general:
   own_address: '15.15.250'
-  rate_limit: 20
-  update_time:
-    seconds: 30
-  cyclic_sending_time:
-    seconds: 60
+#  rate_limit: 20
+#  update_interval:
+#    seconds: 30
+#  cyclic_sending_interval:
+#    seconds: 60
 
 connection:
-  local_ip: '192.168.11.150'
   gateway_ip: '192.168.11.81'
   gateway_port: 3671
+  local_ip: '192.168.11.150'
 
 data_points:
-  - name: 'HKR Soll_Raum'
+  - param_name: 'HKR Soll_Raum'
     data_type: 'temperature'  # 'DPT-9'
     group_address: '1/1/1'
     writable: true
-  - name: 'Stoerung'
+  - param_name: 'Stoerung'
     data_type: 'binary'
     group_address: '1/1/2'
     cyclic_sending: true
-  - name: 'Temp. Aussen verzoegert'
+  - param_name: 'Temp. Aussen verzoegert'
     data_type: 'temperature'  # 'DPT-9'
     group_address: '1/1/3'
     send_on_change: true
     on_change_of: 0.5
+
+notifications:
+  on_malfunction:
+    group_address: '1/2/1'

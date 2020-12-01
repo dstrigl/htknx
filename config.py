@@ -19,68 +19,94 @@
 
 """ TODO """
 
-import yaml
-import voluptuous as vol
-import config_validation as cv
-from xknx.telegram import PhysicalAddress
-from htheatpump.htparams import HtParams
-
 import logging
+
+import voluptuous as vol
+import yaml
+from htheatpump.htparams import HtParams
+from xknx.telegram import PhysicalAddress
+
+import config_validation as cv
+
 _logger = logging.getLogger(__name__)
 
 
 CONF_GENERAL = "general"
 CONF_OWN_ADDRESS = "own_address"
 CONF_RATE_LIMIT = "rate_limit"
-CONF_UPDATE_TIME = "update_time"
-CONF_CYCLIC_SENDING_TIME = "cyclic_sending_time"
+CONF_UPDATE_INTERVAL = "update_interval"
+CONF_CYCLIC_SENDING_INTERVAL = "cyclic_sending_interval"
 CONF_CONNECTION = "connection"
 CONF_LOCAL_IP = "local_ip"
 CONF_GATEWAY_IP = "gateway_ip"
 CONF_GATEWAY_PORT = "gateway_port"
 CONF_DATA_POINTS = "data_points"
-CONF_NAME = "name"
+CONF_PARAM_NAME = "param_name"
 CONF_DATA_TYPE = "data_type"
 CONF_GROUP_ADDRESS = "group_address"
 CONF_WRITABLE = "writable"
 CONF_CYCLIC_SENDING = "cyclic_sending"
 CONF_SEND_ON_CHANGE = "send_on_change"
 CONF_ON_CHANGE_OF = "on_change_of"
-# TODO on_change_of_relative / on_change_of_absolute
+CONF_NOTIFICATIONS = "notifications"
+CONF_ON_MALFUNCTION = "on_malfunction"
 
-KNX_GA_REGEX = "^(3[0-1]|[1-2]\d|\d)/([0-7])/(2[0-5][0-5]|1\d\d|[1-9]?[0-9])$"  # valid GA: [0-31]/[0-7]/[0-255]
-KNX_PA_REGEX = "^(1[0-5]|\d)\.(1[0-5]|\d)\.(2[0-5][0-5]|1\d\d|[1-9]?[0-9])$"  # valid PA: [0-15].[0-15].[0-255]  # TODO
+DEFAULT_GATEWAY_PORT = 3671
 
 
-GENERAL_SCHEMA = vol.Schema({
-    vol.Optional(CONF_OWN_ADDRESS): cv.matches_regex(KNX_PA_REGEX),
-    vol.Optional(CONF_RATE_LIMIT): vol.All(vol.Coerce(int), vol.Range(min=1)),
-    vol.Optional(CONF_UPDATE_TIME): cv.time_interval,
-    vol.Optional(CONF_CYCLIC_SENDING_TIME): cv.time_interval,
-})
+GENERAL_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_OWN_ADDRESS): cv.ensure_physical_address,
+        vol.Optional(CONF_RATE_LIMIT, default=20): vol.All(
+            vol.Coerce(int), vol.Range(min=0, max=100)
+        ),
+        vol.Optional(CONF_UPDATE_INTERVAL, default=30): cv.time_interval,
+        vol.Optional(CONF_CYCLIC_SENDING_INTERVAL, default=300): cv.time_interval,
+    }
+)
 
-CONNECTION_SCHEMA = vol.Schema({
-    vol.Required(CONF_GATEWAY_IP): cv.string,
-    vol.Optional(CONF_GATEWAY_PORT): cv.port,
-    vol.Optional(CONF_LOCAL_IP): cv.string,
-})
+CONNECTION_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_GATEWAY_IP): cv.string,
+        vol.Optional(CONF_GATEWAY_PORT, default=DEFAULT_GATEWAY_PORT): cv.port,
+        vol.Optional(CONF_LOCAL_IP): cv.string,
+    }
+)
 
-DATA_POINT_SCHEMA = vol.Schema({
-    vol.Required(CONF_NAME): vol.All(cv.string, vol.In(HtParams.keys())),
-    vol.Required(CONF_DATA_TYPE): cv.string,  # TODO validate!
-    vol.Required(CONF_GROUP_ADDRESS): cv.matches_regex(KNX_GA_REGEX),
-    vol.Optional(CONF_WRITABLE): cv.boolean,
-    vol.Optional(CONF_CYCLIC_SENDING): cv.boolean,
-    vol.Optional(CONF_SEND_ON_CHANGE): cv.boolean,
-    vol.Optional(CONF_ON_CHANGE_OF): cv.number,
-})
+DATA_POINT_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_PARAM_NAME): vol.All(cv.string, vol.In(HtParams.keys())),
+        vol.Required(CONF_DATA_TYPE): cv.string,  # TODO validate!
+        vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
+        vol.Optional(CONF_WRITABLE): cv.boolean,
+        vol.Optional(CONF_CYCLIC_SENDING): cv.boolean,
+        vol.Optional(CONF_SEND_ON_CHANGE): cv.boolean,
+        vol.Optional(CONF_ON_CHANGE_OF): cv.number,
+        # TODO on_change_of_relative / on_change_of_absolute
+    }
+)
 
-CONFIG_SCHEMA = vol.Schema({
-    CONF_GENERAL: GENERAL_SCHEMA,
-    CONF_CONNECTION: CONNECTION_SCHEMA,
-    CONF_DATA_POINTS: [DATA_POINT_SCHEMA],
-})
-#,extra=vol.ALLOW_EXTRA)  # TODO remove 'extra=vol.ALLOW_EXTRA'
+NOTIFICATION_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
+    }
+)
+
+NOTIFICATIONS_SCHEMA = vol.Schema(
+    {
+        CONF_ON_MALFUNCTION: NOTIFICATION_SCHEMA,
+    }
+)
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        CONF_GENERAL: GENERAL_SCHEMA,
+        CONF_CONNECTION: CONNECTION_SCHEMA,
+        CONF_DATA_POINTS: vol.All(cv.ensure_list, [DATA_POINT_SCHEMA]),
+        vol.Optional(CONF_NOTIFICATIONS): NOTIFICATIONS_SCHEMA,
+    }
+)
+# ,extra=vol.ALLOW_EXTRA)  # TODO remove 'extra=vol.ALLOW_EXTRA'
 
 
 class Config:
@@ -90,53 +116,68 @@ class Config:
         self.htknx = htknx
 
     def read(self, filename="htknx.yaml") -> None:
-        """ Read the configuration from the given file.
+        """Read the configuration from the given file.
 
         :param filename: The filename to read the configuration from, e.g. 'htknx.yaml'.
         :type filename: str
         """
         _logger.debug("reading config file {!r}".format(filename))
         try:
-            with open(filename, 'r') as f:
+            with open(filename, "r") as f:
                 doc = yaml.safe_load(f)
                 doc = CONFIG_SCHEMA(doc)
                 self._parse_general(doc)
                 self._parse_connection(doc)
                 self._parse_data_points(doc)
         except Exception as e:
-            _logger.error("failed to read config file {!r}: {!s}".format(filename, e))
+            _logger.error("failed to read config file '{%s}': %s", filename, e)
             raise
 
     def _parse_general(self, doc) -> None:
         """ Parse the general section of the config file. """
         if CONF_GENERAL in doc:
             if CONF_OWN_ADDRESS in doc[CONF_GENERAL]:
-                self.htknx.own_address = PhysicalAddress(doc[CONF_GENERAL][CONF_OWN_ADDRESS])
+                self.htknx.own_address = PhysicalAddress(
+                    doc[CONF_GENERAL][CONF_OWN_ADDRESS]
+                )
+                print(f"own_address: {self.htknx.own_address}")
             if CONF_RATE_LIMIT in doc[CONF_GENERAL]:
                 self.htknx.rate_limit = doc[CONF_GENERAL][CONF_RATE_LIMIT]
-            if CONF_UPDATE_TIME in doc[CONF_GENERAL]:
-                self.htknx.publish_interval = doc[CONF_GENERAL][CONF_UPDATE_TIME]
+                print(f"rate_limit: {self.htknx.rate_limit}")
+            if CONF_UPDATE_INTERVAL in doc[CONF_GENERAL]:
+                self.htknx.update_interval = doc[CONF_GENERAL][CONF_UPDATE_INTERVAL]
+                print(f"update_interval: {self.htknx.update_interval}")
+            if CONF_CYCLIC_SENDING_INTERVAL in doc[CONF_GENERAL]:
+                self.htknx.publish_interval = doc[CONF_GENERAL][
+                    CONF_CYCLIC_SENDING_INTERVAL
+                ]
+                print(f"publish_interval: {self.htknx.publish_interval}")
 
     def _parse_connection(self, doc) -> None:
         """ Parse the connection section of the config file. """
         if CONF_CONNECTION in doc:
             if CONF_LOCAL_IP in doc[CONF_CONNECTION]:
                 self.htknx.local_ip = doc[CONF_CONNECTION][CONF_LOCAL_IP]
+                print(f"local_ip: {self.htknx.local_ip}")
             if CONF_GATEWAY_IP in doc[CONF_CONNECTION]:
                 self.htknx.gateway_ip = doc[CONF_CONNECTION][CONF_GATEWAY_IP]
+                print(f"gateway_ip: {self.htknx.gateway_ip}")
             if CONF_GATEWAY_PORT in doc[CONF_CONNECTION]:
                 self.htknx.gateway_port = doc[CONF_CONNECTION][CONF_GATEWAY_PORT]
+                print(f"gateway_port: {self.htknx.gateway_port}")
 
     def _parse_data_points(self, doc) -> None:
         """ Parse the data points section of the config file. """
         if CONF_DATA_POINTS in doc:
             for data_point in doc[CONF_DATA_POINTS]:
-                print(data_point)
+                print(f"data_point: {data_point}")
             pass  # TODO
 
 
 if __name__ == "__main__":
+
     class ObjTmp:
         pass
+
     htknx = ObjTmp()
     Config(htknx).read("htknx.yaml")
