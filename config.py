@@ -173,7 +173,9 @@ class Config:
                 self.htknx.auto_reconnect = doc[CONF_CONNECTION][CONF_AUTO_RECONNECT]
                 print(f"auto_reconnect: {self.htknx.auto_reconnect}")
             if CONF_AUTO_RECONNECT_WAIT in doc[CONF_CONNECTION]:
-                self.htknx.auto_reconnect_wait = doc[CONF_CONNECTION][CONF_AUTO_RECONNECT_WAIT]
+                self.htknx.auto_reconnect_wait = doc[CONF_CONNECTION][
+                    CONF_AUTO_RECONNECT_WAIT
+                ]
                 print(f"auto_reconnect_wait: {self.htknx.auto_reconnect_wait}")
 
     def _parse_data_points(self, doc) -> None:
