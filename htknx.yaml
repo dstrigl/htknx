@@ -1,15 +1,18 @@
 general:
   own_address: '15.15.250'
-#  rate_limit: 20
-#  update_interval:
-#    seconds: 30
-#  cyclic_sending_interval:
-#    seconds: 60
+  rate_limit: 20
+  update_interval:
+    seconds: 30
+  cyclic_sending_interval:
+    seconds: 60
 
 connection:
   gateway_ip: '192.168.11.81'
   gateway_port: 3671
   local_ip: '192.168.11.150'
+  auto_reconnect: True
+  auto_reconnect_wait:
+      minutes: 3
 
 data_points:
   - param_name: 'HKR Soll_Raum'

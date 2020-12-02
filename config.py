@@ -40,6 +40,8 @@ CONF_CONNECTION = "connection"
 CONF_LOCAL_IP = "local_ip"
 CONF_GATEWAY_IP = "gateway_ip"
 CONF_GATEWAY_PORT = "gateway_port"
+CONF_AUTO_RECONNECT = "auto_reconnect"
+CONF_AUTO_RECONNECT_WAIT = "auto_reconnect_wait"
 CONF_DATA_POINTS = "data_points"
 CONF_PARAM_NAME = "param_name"
 CONF_DATA_TYPE = "data_type"
@@ -70,6 +72,8 @@ CONNECTION_SCHEMA = vol.Schema(
         vol.Required(CONF_GATEWAY_IP): cv.string,
         vol.Optional(CONF_GATEWAY_PORT, default=DEFAULT_GATEWAY_PORT): cv.port,
         vol.Optional(CONF_LOCAL_IP): cv.string,
+        vol.Optional(CONF_AUTO_RECONNECT, default=False): cv.boolean,
+        vol.Optional(CONF_AUTO_RECONNECT_WAIT, default=3): cv.time_interval,
     }
 )
 
@@ -165,6 +169,12 @@ class Config:
             if CONF_GATEWAY_PORT in doc[CONF_CONNECTION]:
                 self.htknx.gateway_port = doc[CONF_CONNECTION][CONF_GATEWAY_PORT]
                 print(f"gateway_port: {self.htknx.gateway_port}")
+            if CONF_AUTO_RECONNECT in doc[CONF_CONNECTION]:
+                self.htknx.auto_reconnect = doc[CONF_CONNECTION][CONF_AUTO_RECONNECT]
+                print(f"auto_reconnect: {self.htknx.auto_reconnect}")
+            if CONF_AUTO_RECONNECT_WAIT in doc[CONF_CONNECTION]:
+                self.htknx.auto_reconnect_wait = doc[CONF_CONNECTION][CONF_AUTO_RECONNECT_WAIT]
+                print(f"auto_reconnect_wait: {self.htknx.auto_reconnect_wait}")
 
     def _parse_data_points(self, doc) -> None:
         """ Parse the data points section of the config file. """
