@@ -119,7 +119,7 @@ class Config:
     def __init__(self, htknx) -> None:
         self.htknx = htknx
 
-    def read(self, filename="htknx.yaml") -> None:
+    def read(self, filename: str = "htknx.yaml") -> None:
         """Read the configuration from the given file.
 
         :param filename: The filename to read the configuration from, e.g. 'htknx.yaml'.
