@@ -1,3 +1,5 @@
+# Sample configuration
+
 general:
   own_address: '15.15.250'
   rate_limit: 20
