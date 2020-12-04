@@ -17,15 +17,15 @@ connection:
       minutes: 3
 
 data_points:
-  - param_name: 'HKR Soll_Raum'
+  'HKR Soll_Raum':
     data_type: 'temperature'  # 'DPT-9'
     group_address: '1/1/1'
     writable: true
-  - param_name: 'Stoerung'
+  'Stoerung':
     data_type: 'binary'
     group_address: '1/1/2'
     cyclic_sending: true
-  - param_name: 'Temp. Aussen verzoegert'
+  'Temp. Aussen verzoegert':
     data_type: 'temperature'  # 'DPT-9'
     group_address: '1/1/3'
     send_on_change: true

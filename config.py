@@ -24,9 +24,11 @@ import logging
 import voluptuous as vol
 import yaml
 from htheatpump.htparams import HtParams
+from xknx.io import ConnectionConfig, ConnectionType
 from xknx.telegram import PhysicalAddress
 
 import config_validation as cv
+from htdatapoint import HtDataPoint
 
 _logger = logging.getLogger(__name__)
 
@@ -79,7 +81,6 @@ CONNECTION_SCHEMA = vol.Schema(
 
 DATA_POINT_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_PARAM_NAME): vol.All(cv.string, vol.In(HtParams.keys())),
         vol.Required(CONF_DATA_TYPE): cv.string,  # TODO validate!
         vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
         vol.Optional(CONF_WRITABLE): cv.boolean,
@@ -88,6 +89,10 @@ DATA_POINT_SCHEMA = vol.Schema(
         vol.Optional(CONF_ON_CHANGE_OF): cv.number,
         # TODO on_change_of_relative / on_change_of_absolute
     }
+)
+
+DATA_POINTS_SCHEMA = vol.Schema(
+    {vol.All(cv.string, vol.In(HtParams.keys())): DATA_POINT_SCHEMA}
 )
 
 NOTIFICATION_SCHEMA = vol.Schema(
@@ -106,7 +111,7 @@ CONFIG_SCHEMA = vol.Schema(
     {
         CONF_GENERAL: GENERAL_SCHEMA,
         CONF_CONNECTION: CONNECTION_SCHEMA,
-        CONF_DATA_POINTS: vol.All(cv.ensure_list, [DATA_POINT_SCHEMA]),
+        CONF_DATA_POINTS: DATA_POINTS_SCHEMA,
         vol.Optional(CONF_NOTIFICATIONS): NOTIFICATIONS_SCHEMA,
     }
 )
@@ -116,8 +121,8 @@ CONFIG_SCHEMA = vol.Schema(
 class Config:
     """ Class for parsing a given config file, e.g. 'htknx.yaml'. """
 
-    def __init__(self, htknx) -> None:
-        self.htknx = htknx
+    def __init__(self, xknx) -> None:
+        self.xknx = xknx
 
     def read(self, filename: str = "htknx.yaml") -> None:
         """Read the configuration from the given file.
@@ -141,49 +146,55 @@ class Config:
         """ Parse the general section of the config file. """
         if CONF_GENERAL in doc:
             if CONF_OWN_ADDRESS in doc[CONF_GENERAL]:
-                self.htknx.own_address = PhysicalAddress(
+                self.xknx.own_address = PhysicalAddress(
                     doc[CONF_GENERAL][CONF_OWN_ADDRESS]
                 )
-                print(f"own_address: {self.htknx.own_address}")
+                print(f"own_address: {self.xknx.own_address}")
             if CONF_RATE_LIMIT in doc[CONF_GENERAL]:
-                self.htknx.rate_limit = doc[CONF_GENERAL][CONF_RATE_LIMIT]
-                print(f"rate_limit: {self.htknx.rate_limit}")
+                self.xknx.rate_limit = doc[CONF_GENERAL][CONF_RATE_LIMIT]
+                print(f"rate_limit: {self.xknx.rate_limit}")
             if CONF_UPDATE_INTERVAL in doc[CONF_GENERAL]:
-                self.htknx.update_interval = doc[CONF_GENERAL][CONF_UPDATE_INTERVAL]
-                print(f"update_interval: {self.htknx.update_interval}")
+                self.xknx.update_interval = doc[CONF_GENERAL][CONF_UPDATE_INTERVAL]
+                print(f"update_interval: {self.xknx.update_interval}")
             if CONF_CYCLIC_SENDING_INTERVAL in doc[CONF_GENERAL]:
-                self.htknx.publish_interval = doc[CONF_GENERAL][
+                self.xknx.publish_interval = doc[CONF_GENERAL][
                     CONF_CYCLIC_SENDING_INTERVAL
                 ]
-                print(f"publish_interval: {self.htknx.publish_interval}")
+                print(f"publish_interval: {self.xknx.publish_interval}")
 
     def _parse_connection(self, doc) -> None:
         """ Parse the connection section of the config file. """
+        connection_config = ConnectionConfig(connection_type=ConnectionType.TUNNELING)
         if CONF_CONNECTION in doc:
             if CONF_LOCAL_IP in doc[CONF_CONNECTION]:
-                self.htknx.local_ip = doc[CONF_CONNECTION][CONF_LOCAL_IP]
-                print(f"local_ip: {self.htknx.local_ip}")
+                connection_config.local_ip = doc[CONF_CONNECTION][CONF_LOCAL_IP]
+                print(f"local_ip: {connection_config.local_ip}")
             if CONF_GATEWAY_IP in doc[CONF_CONNECTION]:
-                self.htknx.gateway_ip = doc[CONF_CONNECTION][CONF_GATEWAY_IP]
-                print(f"gateway_ip: {self.htknx.gateway_ip}")
+                connection_config.gateway_ip = doc[CONF_CONNECTION][CONF_GATEWAY_IP]
+                print(f"gateway_ip: {connection_config.gateway_ip}")
             if CONF_GATEWAY_PORT in doc[CONF_CONNECTION]:
-                self.htknx.gateway_port = doc[CONF_CONNECTION][CONF_GATEWAY_PORT]
-                print(f"gateway_port: {self.htknx.gateway_port}")
+                connection_config.gateway_port = doc[CONF_CONNECTION][CONF_GATEWAY_PORT]
+                print(f"gateway_port: {connection_config.gateway_port}")
             if CONF_AUTO_RECONNECT in doc[CONF_CONNECTION]:
-                self.htknx.auto_reconnect = doc[CONF_CONNECTION][CONF_AUTO_RECONNECT]
-                print(f"auto_reconnect: {self.htknx.auto_reconnect}")
+                connection_config.auto_reconnect = doc[CONF_CONNECTION][
+                    CONF_AUTO_RECONNECT
+                ]
+                print(f"auto_reconnect: {connection_config.auto_reconnect}")
             if CONF_AUTO_RECONNECT_WAIT in doc[CONF_CONNECTION]:
-                self.htknx.auto_reconnect_wait = doc[CONF_CONNECTION][
+                connection_config.auto_reconnect_wait = doc[CONF_CONNECTION][
                     CONF_AUTO_RECONNECT_WAIT
                 ]
-                print(f"auto_reconnect_wait: {self.htknx.auto_reconnect_wait}")
+                print(f"auto_reconnect_wait: {connection_config.auto_reconnect_wait}")
+            self.xknx.connection_config = connection_config
 
     def _parse_data_points(self, doc) -> None:
         """ Parse the data points section of the config file. """
         if CONF_DATA_POINTS in doc:
-            for data_point in doc[CONF_DATA_POINTS]:
-                print(f"data_point: {data_point}")
-            pass  # TODO
+            print(f"{CONF_DATA_POINTS}:")
+            for name, config in doc[CONF_DATA_POINTS].items():
+                print(f"\t'{name}':")
+                print(f"\t\t{config}")
+                HtDataPoint.from_config(self.xknx, name, config)
 
 
 if __name__ == "__main__":
@@ -191,5 +202,5 @@ if __name__ == "__main__":
     class ObjTmp:
         pass
 
-    htknx = ObjTmp()
-    Config(htknx).read("htknx.yaml")
+    xknx = ObjTmp()
+    Config(xknx).read("htknx.yaml")
