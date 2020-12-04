@@ -114,13 +114,13 @@ class HtDataPoint(Device):
 
     def __str__(self):
         """ Return object as readable string. """
-        return (
-            '<HtDataPoint name="{}" '
-            'group-address="{}" value="{}" unit="{}" writable="{}"/>'.format(
-                self.name,
-                self.param_value.group_addr_str(),
-                self.resolve_state(),
-                self.unit_of_measurement(),
-                "yes" if self.writable else "no",
-            )
+        return '<HtDataPoint name="{}" group-address="{}" value_type="{}" value="{}" unit="{}" writable="{}"/>'.format(
+            self.name,
+            self.param_value.group_address,
+            "binary"
+            if isinstance(self.param_value, RemoteValueSwitch)
+            else self.param_value.dpt_class.value_type,
+            self.resolve_state(),
+            self.unit_of_measurement(),
+            "yes" if self.writable else "no",
         )

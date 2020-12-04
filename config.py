@@ -46,7 +46,7 @@ CONF_AUTO_RECONNECT = "auto_reconnect"
 CONF_AUTO_RECONNECT_WAIT = "auto_reconnect_wait"
 CONF_DATA_POINTS = "data_points"
 CONF_PARAM_NAME = "param_name"
-CONF_DATA_TYPE = "data_type"
+CONF_VALUE_TYPE = "value_type"
 CONF_GROUP_ADDRESS = "group_address"
 CONF_WRITABLE = "writable"
 CONF_CYCLIC_SENDING = "cyclic_sending"
@@ -81,7 +81,7 @@ CONNECTION_SCHEMA = vol.Schema(
 
 DATA_POINT_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_DATA_TYPE): cv.string,  # TODO validate!
+        vol.Required(CONF_VALUE_TYPE): cv.string,  # TODO validate!
         vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
         vol.Optional(CONF_WRITABLE): cv.boolean,
         vol.Optional(CONF_CYCLIC_SENDING): cv.boolean,
@@ -138,6 +138,7 @@ class Config:
                 self._parse_general(doc)
                 self._parse_connection(doc)
                 self._parse_data_points(doc)
+                self._parse_notifications(doc)
         except Exception as e:
             _logger.error("failed to read config file '{%s}': %s", filename, e)
             raise
@@ -153,11 +154,13 @@ class Config:
             if CONF_RATE_LIMIT in doc[CONF_GENERAL]:
                 self.xknx.rate_limit = doc[CONF_GENERAL][CONF_RATE_LIMIT]
                 print(f"rate_limit: {self.xknx.rate_limit}")
-            if CONF_UPDATE_INTERVAL in doc[CONF_GENERAL]:
+            if CONF_UPDATE_INTERVAL in doc[CONF_GENERAL]:  # TODO not part of xknx!
                 self.xknx.update_interval = doc[CONF_GENERAL][CONF_UPDATE_INTERVAL]
                 print(f"update_interval: {self.xknx.update_interval}")
             if CONF_CYCLIC_SENDING_INTERVAL in doc[CONF_GENERAL]:
-                self.xknx.publish_interval = doc[CONF_GENERAL][
+                self.xknx.publish_interval = doc[
+                    CONF_GENERAL
+                ][  # TODO not part of xknx!
                     CONF_CYCLIC_SENDING_INTERVAL
                 ]
                 print(f"publish_interval: {self.xknx.publish_interval}")
@@ -190,17 +193,11 @@ class Config:
     def _parse_data_points(self, doc) -> None:
         """ Parse the data points section of the config file. """
         if CONF_DATA_POINTS in doc:
-            print(f"{CONF_DATA_POINTS}:")
+            # print(f"{CONF_DATA_POINTS}:")
             for name, config in doc[CONF_DATA_POINTS].items():
-                print(f"\t'{name}':")
-                print(f"\t\t{config}")
-                HtDataPoint.from_config(self.xknx, name, config)
+                dp = HtDataPoint.from_config(self.xknx, name, config)
+                print(dp)
 
-
-if __name__ == "__main__":
-
-    class ObjTmp:
-        pass
-
-    xknx = ObjTmp()
-    Config(xknx).read("htknx.yaml")
+    def _parse_notifications(self, doc) -> None:
+        """ Parse the notifications section of the config file. """
+        pass  # TODO

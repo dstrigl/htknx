@@ -22,6 +22,9 @@
 import asyncio
 import logging
 
+from xknx import XKNX
+from config import Config
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -29,7 +32,13 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def main():
-    pass
+    xknx = XKNX()
+    Config(xknx).read("htknx.yaml")
+
+    await xknx.start()
+    # Wait until Ctrl-C was pressed
+    await xknx.loop_until_sigint()
+    await xknx.stop()
 
 
 if __name__ == "__main__":
