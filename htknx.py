@@ -32,6 +32,10 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def main():
+    # activate logging with level DEBUG
+    log_format = "%(asctime)s %(levelname)s [%(name)s|%(funcName)s]: %(message)s"
+    logging.basicConfig(level=logging.INFO, format=log_format)
+
     xknx = XKNX()
     Config(xknx).read("htknx.yaml")
 

@@ -19,19 +19,19 @@ connection:
 data_points:
   'HKR Soll_Raum':
     value_type: 'temperature'  # 'DPT-9'
-    group_address: '1/1/1'
+    group_address: '1/2/1'
     writable: true
   'Stoerung':
     value_type: 'binary'
-    group_address: '1/1/2'
+    group_address: '1/2/2'
     cyclic_sending: true
   'Temp. Aussen verzoegert':
     #value_type: 'temperature'  # 'DPT-9'
     value_type: 'DPT-9'
-    group_address: '1/1/3'
+    group_address: '1/2/3'
     send_on_change: true
     on_change_of: 0.5
 
 notifications:
   on_malfunction:
-    group_address: '1/2/1'
+    group_address: '1/3/1'

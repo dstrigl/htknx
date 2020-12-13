@@ -3,14 +3,16 @@
 
 """ TODO """
 
+import logging
+
 from xknx.devices import Device
 from xknx.remote_value.remote_value_sensor import RemoteValueSensor
 from xknx.remote_value.remote_value_switch import RemoteValueSwitch
 
 # from ??? import ht_heatpump  # type: ignore
 
-# import logging
-# _logger = logging.getLogger(__name__)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class HtDataPoint(Device):
@@ -24,7 +26,7 @@ class HtDataPoint(Device):
         value_type: str,
         writable: bool = False,
     ):
-        """ Initialize HtHeatpumpParam class. """
+        """ Initialize HtDataPoint class. """
         super().__init__(xknx, name)
 
         self.param_value = None
@@ -69,10 +71,10 @@ class HtDataPoint(Device):
     async def broadcast_value(self, response=False):
         """ Broadcast parameter value to KNX bus. """
         # TODO query value, try/except
-        value = 123
+        value = 124
         # value = await ht_heatpump.get_param_async(self.name)
-        self.xknx.logger.info(
-            "HtHeatpumpParam.broadcast_value: ht_heatpump.get_param('%s') -> %s",
+        _LOGGER.info(
+            "HtDataPoint.broadcast_value: ht_heatpump.get_param('%s') -> %s",
             self.name,
             value,
         )
@@ -80,24 +82,24 @@ class HtDataPoint(Device):
 
     async def process_group_read(self, telegram):
         """ Process incoming GROUP READ telegram. """
-        self.xknx.logger.info("HtHeatpumpParam.process_group_read: %s", telegram)
+        _LOGGER.info("HtDataPoint.process_group_read: %s", telegram)
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """ Process incoming GROUP WRITE telegram. """
-        self.xknx.logger.info("HtHeatpumpParam.process_group_write: %s", telegram)
+        _LOGGER.info("HtDataPoint.process_group_write: %s", telegram)
         if await self.param_value.process(telegram):
             value = self.param_value.value
             if not self.writable:
-                self.xknx.logger.warning(
+                _LOGGER.warning(
                     "Attempted to set value for non-writable heat pump parameter: '%s' (value: %s)",
                     self.name,
                     value,
                 )
                 return
             # TODO set value, try/except
-            self.xknx.logger.info(
-                "HtHeatpumpParam.process_group_write: ht_heatpump.set_param('%s', %s)",
+            _LOGGER.info(
+                "HtDataPoint.process_group_write: ht_heatpump.set_param('%s', %s)",
                 self.name,
                 value,
             )

@@ -9,7 +9,6 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
-venv/
 build/
 develop-eggs/
 dist/
@@ -55,6 +54,17 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# mypy
+.mypy_cache/
+
+# Visual Studio Code
+.vscode
 
 # PyBuilder
 target/
