@@ -4,9 +4,9 @@ general:
   own_address: '15.15.250'
   rate_limit: 20
   update_interval:
-    seconds: 30
+    seconds: 3
   cyclic_sending_interval:
-    seconds: 60
+    seconds: 5
 
 connection:
   gateway_ip: '192.168.11.81'

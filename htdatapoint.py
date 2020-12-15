@@ -16,7 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class HtDataPoint(Device):
-    """ Representation of a Heliotherm heat pump parameter. """
+    """Representation of a Heliotherm heat pump parameter."""
 
     def __init__(
         self,
@@ -26,7 +26,7 @@ class HtDataPoint(Device):
         value_type: str,
         writable: bool = False,
     ):
-        """ Initialize HtDataPoint class. """
+        """Initialize HtDataPoint class."""
         super().__init__(xknx, name)
 
         self.param_value = None
@@ -50,12 +50,12 @@ class HtDataPoint(Device):
         self.writable = writable
 
     def _iter_remote_values(self):
-        """ Iterate the devices RemoteValue classes. """
+        """Iterate the devices RemoteValue classes."""
         yield self.param_value
 
     @classmethod
     def from_config(cls, xknx, name, config):
-        """ Initialize object from configuration structure. """
+        """Initialize object from configuration structure."""
         group_address = config.get("group_address")
         value_type = config.get("value_type")
         writable = config.get("writable")
@@ -69,7 +69,7 @@ class HtDataPoint(Device):
         )
 
     async def broadcast_value(self, response=False):
-        """ Broadcast parameter value to KNX bus. """
+        """Broadcast parameter value to KNX bus."""
         # TODO query value, try/except
         value = 124
         # value = await ht_heatpump.get_param_async(self.name)
@@ -81,12 +81,12 @@ class HtDataPoint(Device):
         await self.param_value.set(value, response=response)
 
     async def process_group_read(self, telegram):
-        """ Process incoming GROUP READ telegram. """
+        """Process incoming GROUP READ telegram."""
         _LOGGER.info("HtDataPoint.process_group_read: %s", telegram)
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
-        """ Process incoming GROUP WRITE telegram. """
+        """Process incoming GROUP WRITE telegram."""
         _LOGGER.info("HtDataPoint.process_group_write: %s", telegram)
         if await self.param_value.process(telegram):
             value = self.param_value.value
@@ -107,15 +107,15 @@ class HtDataPoint(Device):
             self.param_value.payload = self.param_value.to_knx(value)
 
     def unit_of_measurement(self):
-        """ Return the unit of measurement. """
+        """Return the unit of measurement."""
         return self.param_value.unit_of_measurement
 
     def resolve_state(self):
-        """ Return the current state of the heat pump parameter as a human readable string. """
+        """Return the current state of the heat pump parameter as a human readable string."""
         return self.param_value.value
 
     def __str__(self):
-        """ Return object as readable string. """
+        """Return object as readable string."""
         return '<HtDataPoint name="{}" group-address="{}" value_type="{}" value="{}" unit="{}" writable="{}"/>'.format(
             self.name,
             self.param_value.group_address,
