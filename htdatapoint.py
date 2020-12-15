@@ -25,9 +25,10 @@ class HtDataPoint(Device):
         group_address,
         value_type: str,
         writable: bool = False,
+        device_updated_cb=None,
     ):
         """Initialize HtDataPoint class."""
-        super().__init__(xknx, name)
+        super().__init__(xknx, name, device_updated_cb)
 
         self.param_value = None
         if value_type == "binary":
