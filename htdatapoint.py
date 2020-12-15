@@ -9,6 +9,8 @@ from xknx.devices import Device
 from xknx.remote_value.remote_value_sensor import RemoteValueSensor
 from xknx.remote_value.remote_value_switch import RemoteValueSwitch
 
+from typing import Union
+
 # from ??? import ht_heatpump  # type: ignore
 
 
@@ -25,6 +27,9 @@ class HtDataPoint(Device):
         group_address,
         value_type: str,
         writable: bool = False,
+        cyclic_sending: bool = False,
+        send_on_change: bool = False,
+        on_change_of: Union[None, int, float] = None,
         device_updated_cb=None,
     ):
         """Initialize HtDataPoint class."""
@@ -49,17 +54,24 @@ class HtDataPoint(Device):
                 value_type=value_type,
             )
         self.writable = writable
+        self.cyclic_sending = cyclic_sending
+        self.send_on_change = send_on_change
+        self.on_change_of = on_change_of
+        self.last_sent_value: Union[None, bool, int, float] = None
 
     def _iter_remote_values(self):
         """Iterate the devices RemoteValue classes."""
         yield self.param_value
 
     @classmethod
-    def from_config(cls, xknx, name, config):
+    def from_config(cls, xknx, name, config, device_updated_cb=None):
         """Initialize object from configuration structure."""
         group_address = config.get("group_address")
         value_type = config.get("value_type")
         writable = config.get("writable")
+        cyclic_sending = config.get("cyclic_sending")
+        send_on_change = config.get("send_on_chnage")
+        on_change_of = config.get("on_change_of")
 
         return cls(
             xknx,
@@ -67,19 +79,22 @@ class HtDataPoint(Device):
             group_address=group_address,
             value_type=value_type,
             writable=writable,
+            cyclic_sending=cyclic_sending,
+            send_on_change=send_on_change,
+            on_change_of=on_change_of,
+            device_updated_cb=device_updated_cb,
         )
 
     async def broadcast_value(self, response=False):
         """Broadcast parameter value to KNX bus."""
-        # TODO query value, try/except
-        value = 124
-        # value = await ht_heatpump.get_param_async(self.name)
-        _LOGGER.info(
-            "HtDataPoint.broadcast_value: ht_heatpump.get_param('%s') -> %s",
-            self.name,
-            value,
-        )
-        await self.param_value.set(value, response=response)
+        if response or self.cyclic_sending:
+            value = self.param_value.value
+            value = (
+                True if isinstance(self.param_value, RemoteValueSwitch) else 123
+            )  # TODO remove!
+            if value is None:
+                return
+            await self.param_value.set(value, response=response)
 
     async def process_group_read(self, telegram):
         """Process incoming GROUP READ telegram."""
@@ -98,9 +113,9 @@ class HtDataPoint(Device):
                     value,
                 )
                 return
-            # TODO set value, try/except
+            # TODO ht_heatpump.set_param_async() in try-block
             _LOGGER.info(
-                "HtDataPoint.process_group_write: ht_heatpump.set_param('%s', %s)",
+                "HtDataPoint.process_group_write: ht_heatpump.set_param_async('%s', %s)",
                 self.name,
                 value,
             )
@@ -108,8 +123,32 @@ class HtDataPoint(Device):
             self.param_value.payload = self.param_value.to_knx(value)
 
     async def set(self, value):
-        """Set new value."""
-        await self.param_value.set(value)
+        """Set new value and send it to the KNX bus, if desired."""
+        if value is None:
+            return
+        # TODO on_change_of_relative / on_change_of_absolute
+        if (
+            isinstance(self.param_value, RemoteValueSwitch)
+            and value != self.param_value.value
+        ):
+            if self.send_on_change:
+                await self.param_value.set(value)
+                self.last_sent_value = value
+            else:
+                self.param_value.payload = self.param_value.to_knx(value)
+        elif (
+            isinstance(self.param_value, RemoteValueSensor)
+            and value != self.param_value.value
+        ):
+            if self.send_on_change and (
+                self.on_change_of is None
+                or self.last_sent_value is None
+                or abs(value - self.last_sent_value) >= abs(self.on_change_of)
+            ):
+                await self.param_value.set(value)
+                self.last_sent_value = value
+            else:
+                self.param_value.payload = self.param_value.to_knx(value)
 
     def unit_of_measurement(self):
         """Return the unit of measurement."""
@@ -121,7 +160,10 @@ class HtDataPoint(Device):
 
     def __str__(self):
         """Return object as readable string."""
-        return '<HtDataPoint name="{}" group-address="{}" value_type="{}" value="{}" unit="{}" writable="{}"/>'.format(
+        return (
+            '<HtDataPoint name="{}" group_address="{}" value_type="{}" value="{}" unit="{}"'
+            ' writable="{}" cyclic_sending="{}" send_on_change="{}" on_change_of="{}"/>'
+        ).format(
             self.name,
             self.param_value.group_address,
             "binary"
@@ -130,4 +172,7 @@ class HtDataPoint(Device):
             self.resolve_state(),
             self.unit_of_measurement(),
             "yes" if self.writable else "no",
+            "yes" if self.cyclic_sending else "no",
+            "yes" if self.send_on_change else "no",
+            self.on_change_of,
         )

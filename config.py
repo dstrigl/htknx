@@ -93,10 +93,13 @@ DATA_POINT_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE_TYPE): cv.string,  # TODO validate!
         vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
-        vol.Optional(CONF_WRITABLE): cv.boolean,
-        vol.Optional(CONF_CYCLIC_SENDING): cv.boolean,
-        vol.Optional(CONF_SEND_ON_CHANGE): cv.boolean,
-        vol.Optional(CONF_ON_CHANGE_OF): cv.number,
+        vol.Optional(CONF_WRITABLE, default=False): cv.boolean,
+        vol.Optional(CONF_CYCLIC_SENDING, default=False): cv.boolean,
+        vol.Optional(CONF_SEND_ON_CHANGE, default=False): cv.boolean,
+        vol.Optional(
+            CONF_ON_CHANGE_OF
+        ): cv.number,  # TODO only allowed for data points with value type != 'binary' and 'send_on_change' == True
+        # TODO cv.positive_number
         # TODO on_change_of_relative / on_change_of_absolute
     }
 )
