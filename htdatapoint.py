@@ -107,6 +107,10 @@ class HtDataPoint(Device):
             # value = await ht_heatpump.set_param_async(self.name, value)
             self.param_value.payload = self.param_value.to_knx(value)
 
+    async def set(self, value):
+        """Set new value."""
+        await self.param_value.set(value)
+
     def unit_of_measurement(self):
         """Return the unit of measurement."""
         return self.param_value.unit_of_measurement
