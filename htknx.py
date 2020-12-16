@@ -96,7 +96,7 @@ class HtPublisher:
             while True:
                 _LOGGER.info("*** update ***")  # TODO remove!
                 for notif in self._notifications.values():
-                    notif.do()
+                    await notif.do()
                 try:
                     params = await self._hthp.query_async(*self._data_points.keys())
                     for name, value in params.items():
