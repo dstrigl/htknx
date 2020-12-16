@@ -32,7 +32,8 @@ from typing import Dict, Any
 
 import config_validation as cv
 
-_logger = logging.getLogger(__name__)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 CONF_GENERAL = "general"
@@ -64,6 +65,7 @@ CONF_ON_CHANGE_OF = "on_change_of"
 
 CONF_NOTIFICATIONS = "notifications"
 CONF_ON_MALFUNCTION = "on_malfunction"
+CONF_REPEAT_AFTER = "repeat_after"
 
 
 DEFAULT_UPDATE_INTERVAL = 30
@@ -133,7 +135,15 @@ NOTIFICATION_SCHEMA = vol.Schema(
     {vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address}
 )
 
-NOTIFICATIONS_SCHEMA = vol.Schema({CONF_ON_MALFUNCTION: NOTIFICATION_SCHEMA})
+ON_MALFUNCTION_SCHEMA = NOTIFICATION_SCHEMA.extend(
+    {
+        vol.Optional(CONF_REPEAT_AFTER, default=None): vol.Any(
+            cv.time_interval, None
+        ),  # TODO > 0
+    }
+)
+
+NOTIFICATIONS_SCHEMA = vol.Schema({CONF_ON_MALFUNCTION: ON_MALFUNCTION_SCHEMA})
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -175,7 +185,7 @@ class Config:
         :param filename: The filename to read the configuration from, e.g. 'htknx.yaml'.
         :type filename: str
         """
-        _logger.debug("reading config file {!r}".format(filename))
+        _LOGGER.debug("reading config file {!r}".format(filename))
         try:
             with open(filename, "r") as f:
                 doc = yaml.safe_load(f)
@@ -186,7 +196,7 @@ class Config:
                 self._parse_data_points(doc)
                 self._parse_notifications(doc)
         except Exception as e:
-            _logger.error("failed to read config file '{%s}': %s", filename, e)
+            _LOGGER.error("failed to read config file '{%s}': %s", filename, e)
             raise
 
     def _parse_general_settings(self, doc) -> None:

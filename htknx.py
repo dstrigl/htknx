@@ -27,10 +27,12 @@ from xknx import XKNX
 from xknx.devices import Notification
 from datetime import timedelta
 from htheatpump import HtHeatpump
-from typing import Dict, Optional
+from typing import Dict, Optional, Type
 
 from config import Config
 from htdatapoint import HtDataPoint
+from htfaultnotification import HtFaultNotification
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +44,7 @@ class HtPublisher:
         self,
         hthp: HtHeatpump,
         data_points: Dict[str, HtDataPoint],
-        notifications: Dict[str, Notification],
+        notifications: Dict[str, Type[Notification]],
         update_interval: timedelta,
         cyclic_sending_interval: timedelta,
     ):
@@ -93,6 +95,8 @@ class HtPublisher:
             """Endless loop for updating the heat pump parameter values."""
             while True:
                 _LOGGER.info("*** update ***")  # TODO remove!
+                for notif in self._notifications.values():
+                    notif.do()
                 try:
                     params = await self._hthp.query_async(*self._data_points.keys())
                     for name, value in params.items():
@@ -147,11 +151,12 @@ async def main():
         data_points[dp_name] = HtDataPoint.from_config(xknx, hthp, dp_name, dp_conf)
 
     # create notifications
-    notifications: Dict[str, Notification] = {}
+    notifications: Dict[str, Type[Notification]] = {}
     for notif_name, notif_conf in config.notifications.items():
-        notifications[notif_name] = Notification.from_config(
-            xknx, notif_name, notif_conf
-        )
+        if notif_name == "on_malfunction":
+            notifications[notif_name] = HtFaultNotification.from_config(
+                xknx, hthp, notif_name, notif_conf
+            )
 
     publisher = HtPublisher(hthp, data_points, notifications, **config.general)
 

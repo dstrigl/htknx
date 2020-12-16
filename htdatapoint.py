@@ -18,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class HtDataPoint(Device):
-    """Representation of a Heliotherm heat pump parameter."""
+    """Representation of a Heliotherm heat pump data point."""
 
     def __init__(
         self,
