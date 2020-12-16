@@ -26,6 +26,7 @@ import pprint
 from xknx import XKNX
 from xknx.devices import Notification
 from datetime import timedelta
+from htheatpump import HtHeatpump
 from typing import Dict, Optional
 
 from config import Config
@@ -37,8 +38,18 @@ _LOGGER = logging.getLogger(__name__)
 class HtPublisher:
     """Class for periodically updating and publishing Heliotherm heat pump data points."""
 
-    def __init__(self, update_interval: timedelta, cyclic_sending_interval: timedelta):
+    def __init__(
+        self,
+        hthp: HtHeatpump,
+        data_points: Dict[str, HtDataPoint],
+        notifications: Dict[str, Notification],
+        update_interval: timedelta,
+        cyclic_sending_interval: timedelta,
+    ):
         """Initialize the HtPublisher class."""
+        self._hthp = hthp
+        self._data_points = data_points
+        self._notifications = notifications
         self._update_interval = update_interval
         self._cyclic_sending_interval = cyclic_sending_interval
         self._update_task: Optional[asyncio.Task] = None
@@ -81,8 +92,13 @@ class HtPublisher:
         async def update_loop(self, update_interval: timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
-                # TODO
-                _LOGGER.info("*** update ***")
+                _LOGGER.info("*** update ***")  # TODO remove!
+                try:
+                    params = await self._hthp.query_async(*self._data_points.keys())
+                    for name, value in params.items():
+                        await self._data_points[name].set(value)
+                except Exception as ex:
+                    _LOGGER.exception(ex)
                 await asyncio.sleep(update_interval.total_seconds())
 
         if update_interval.total_seconds() > 0:
@@ -98,8 +114,9 @@ class HtPublisher:
         async def cyclic_sending_loop(self, cyclic_sending_interval: timedelta):
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
-                # TODO
-                _LOGGER.info("*** cyclic_sending ***")
+                _LOGGER.info("*** cyclic_sending ***")  # TODO remove!
+                for dp in self._data_points.values():
+                    await dp.broadcast_value()
                 await asyncio.sleep(cyclic_sending_interval.total_seconds())
 
         if cyclic_sending_interval.total_seconds() > 0:
@@ -119,19 +136,15 @@ async def main():
 
     config = Config()
     config.read("htknx.yaml")
-    # pprint.pprint(config.__dict__)
+    pprint.pprint(config.__dict__)
 
-    pprint.pprint(config.heat_pump)
-    pprint.pprint(config.knx)
-    pprint.pprint(config.data_points)
-    pprint.pprint(config.notifications)
-
+    hthp = HtHeatpump(**config.heat_pump)
     xknx = XKNX(**config.knx)
 
     # create data points
     data_points: Dict[str, HtDataPoint] = {}
     for dp_name, dp_conf in config.data_points.items():
-        data_points[dp_name] = HtDataPoint.from_config(xknx, dp_name, dp_conf)
+        data_points[dp_name] = HtDataPoint.from_config(xknx, hthp, dp_name, dp_conf)
 
     # create notifications
     notifications: Dict[str, Notification] = {}
@@ -140,7 +153,7 @@ async def main():
             xknx, notif_name, notif_conf
         )
 
-    publisher = HtPublisher(**config.general)
+    publisher = HtPublisher(hthp, data_points, notifications, **config.general)
 
     await xknx.start()
     publisher.start()

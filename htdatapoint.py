@@ -5,12 +5,13 @@
 
 import logging
 
+from xknx import XKNX
 from xknx.devices import Device
 from xknx.remote_value.remote_value_sensor import RemoteValueSensor
 from xknx.remote_value.remote_value_switch import RemoteValueSwitch
+from xknx.telegram import TelegramDirection
+from htheatpump import HtHeatpump
 from typing import Union
-
-# from ??? import ht_heatpump  # type: ignore
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -21,7 +22,8 @@ class HtDataPoint(Device):
 
     def __init__(
         self,
-        xknx,
+        xknx: XKNX,
+        hthp: HtHeatpump,
         name: str,
         group_address,
         value_type: str,
@@ -33,6 +35,7 @@ class HtDataPoint(Device):
     ):
         """Initialize HtDataPoint class."""
         super().__init__(xknx, name, device_updated_cb)
+        self.hthp = hthp
 
         self.param_value = None
         if value_type == "binary":
@@ -63,7 +66,7 @@ class HtDataPoint(Device):
         yield self.param_value
 
     @classmethod
-    def from_config(cls, xknx, name, config, device_updated_cb=None):
+    def from_config(cls, xknx, hthp, name, config, device_updated_cb=None):
         """Initialize object from configuration structure."""
         group_address = config.get("group_address")
         value_type = config.get("value_type")
@@ -74,6 +77,7 @@ class HtDataPoint(Device):
 
         return cls(
             xknx,
+            hthp,
             name,
             group_address=group_address,
             value_type=value_type,
@@ -89,7 +93,7 @@ class HtDataPoint(Device):
         if response or self.cyclic_sending:
             value = self.param_value.value
             # TODO remove!
-            value = True if isinstance(self.param_value, RemoteValueSwitch) else 123
+            value = True if isinstance(self.param_value, RemoteValueSwitch) else 125
             if value is None:
                 return
             _LOGGER.info(
@@ -105,11 +109,15 @@ class HtDataPoint(Device):
 
     async def process_group_read(self, telegram):
         """Process incoming GROUP READ telegram."""
+        if telegram.direction == TelegramDirection.OUTGOING:
+            return
         _LOGGER.info("HtDataPoint('%s').process_group_read: %s", self.name, telegram)
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """Process incoming GROUP WRITE telegram."""
+        if telegram.direction == TelegramDirection.OUTGOING:
+            return
         _LOGGER.info("HtDataPoint('%s').process_group_write: %s", self.name, telegram)
         if await self.param_value.process(telegram):
             value = self.param_value.value
@@ -120,21 +128,22 @@ class HtDataPoint(Device):
                     value,
                 )
                 return
-            # TODO await ht_heatpump.set_param_async() in try-block
-            _LOGGER.info(
-                "HtDataPoint('%s').process_group_write: ht_heatpump.set_param_async('%s', %s)",
-                self.name,
-                self.name,
-                value,
-            )
-            # value = await ht_heatpump.set_param_async(self.name, value)
-            self.param_value.payload = self.param_value.to_knx(value)
+            try:
+                _LOGGER.info(
+                    "HtDataPoint('%s').process_group_write: hthp.set_param_async('%s', %s)",
+                    self.name,
+                    self.name,
+                    value,
+                )
+                value = await self.hthp.set_param_async(self.name, value)
+                self.param_value.payload = self.param_value.to_knx(value)
+            except Exception as ex:
+                _LOGGER.exception(ex)
 
     async def set(self, value):
         """Set new value and send it to the KNX bus if desired."""
         if value is None:
             return
-        # TODO on_change_of_relative / on_change_of_absolute
         if isinstance(self.param_value, RemoteValueSwitch):
             _LOGGER.info(
                 "HtDataPoint('%s').set: value=%s (send_on_change: %s, last_sent_value: %s)",
@@ -157,6 +166,7 @@ class HtDataPoint(Device):
                 self.on_change_of,
                 self.last_sent_value,
             )
+            # TODO on_change_of_relative / on_change_of_absolute
             if self.send_on_change and (
                 self.on_change_of is None
                 or self.last_sent_value is None

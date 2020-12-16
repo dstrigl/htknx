@@ -2,14 +2,14 @@
 
 general:
   update_interval:
-    seconds: 3
+    seconds: 10
   cyclic_sending_interval:
-    seconds: 6
+    #seconds: 1
+    milliseconds: 100
 
 heat_pump:
   device: /dev/ttyUSB0
   baudrate: 115200
-  param_verification: True
 
 knx:
   gateway_ip: '192.168.11.81'
@@ -29,13 +29,14 @@ data_points:
   'Stoerung':
     value_type: 'binary'
     group_address: '1/2/2'
-    cyclic_sending: true
+    #cyclic_sending: true
   'Temp. Aussen verzoegert':
     #value_type: 'temperature'  # 'DPT-9'
     value_type: 'DPT-9'
     group_address: '1/2/3'
-    send_on_change: true
-    on_change_of: 0.5
+    cyclic_sending: true
+    #send_on_change: true
+    #on_change_of: 0.5
 
 notifications:
   on_malfunction:

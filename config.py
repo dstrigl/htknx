@@ -42,7 +42,6 @@ CONF_CYCLIC_SENDING_INTERVAL = "cyclic_sending_interval"
 CONF_HEAT_PUMP = "heat_pump"
 CONF_DEVICE = "device"
 CONF_BAUDRATE = "baudrate"
-CONF_PARAM_VERIFICATION = "param_verification"
 
 CONF_KNX = "knx"
 CONF_GATEWAY_IP = "gateway_ip"
@@ -91,7 +90,6 @@ HEAT_PUMP_SCHEMA = vol.Schema(
         vol.Optional(CONF_BAUDRATE, default=DEFAULT_BAUDRATE): vol.All(
             vol.Coerce(int), vol.In([9600, 19200, 38400, 57600, 115200])
         ),
-        vol.Optional(CONF_PARAM_VERIFICATION, default=True): cv.boolean,
     }
 )
 
@@ -135,9 +133,7 @@ NOTIFICATION_SCHEMA = vol.Schema(
     {vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address}
 )
 
-NOTIFICATIONS_SCHEMA = vol.Schema(
-    {CONF_ON_MALFUNCTION: NOTIFICATION_SCHEMA, "on_xyz": NOTIFICATION_SCHEMA}
-)
+NOTIFICATIONS_SCHEMA = vol.Schema({CONF_ON_MALFUNCTION: NOTIFICATION_SCHEMA})
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -162,7 +158,6 @@ class Config:
         self.heat_pump: Dict[str, Any] = {
             CONF_DEVICE: None,
             CONF_BAUDRATE: DEFAULT_BAUDRATE,
-            CONF_PARAM_VERIFICATION: True,
         }
         self.knx: Dict[str, Any] = {
             "connection_config": ConnectionConfig(
@@ -235,8 +230,7 @@ class Config:
     def _parse_data_points(self, doc) -> None:
         """Parse the data points section of the config file."""
         if CONF_DATA_POINTS in doc:
-            for name, config in doc[CONF_DATA_POINTS].items():
-                self.data_points[name] = config
+            self.data_points.update(doc[CONF_DATA_POINTS])
 
     def _parse_notifications(self, doc) -> None:
         """Parse the notifications section of the config file."""
