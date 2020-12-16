@@ -8,7 +8,6 @@ import logging
 from xknx.devices import Device
 from xknx.remote_value.remote_value_sensor import RemoteValueSensor
 from xknx.remote_value.remote_value_switch import RemoteValueSwitch
-
 from typing import Union
 
 # from ??? import ht_heatpump  # type: ignore
@@ -70,7 +69,7 @@ class HtDataPoint(Device):
         value_type = config.get("value_type")
         writable = config.get("writable")
         cyclic_sending = config.get("cyclic_sending")
-        send_on_change = config.get("send_on_chnage")
+        send_on_change = config.get("send_on_change")
         on_change_of = config.get("on_change_of")
 
         return cls(
@@ -89,21 +88,29 @@ class HtDataPoint(Device):
         """Broadcast parameter value to KNX bus."""
         if response or self.cyclic_sending:
             value = self.param_value.value
-            value = (
-                True if isinstance(self.param_value, RemoteValueSwitch) else 123
-            )  # TODO remove!
+            # TODO remove!
+            value = True if isinstance(self.param_value, RemoteValueSwitch) else 123
             if value is None:
                 return
+            _LOGGER.info(
+                "HtDataPoint('%s').broadcast_value: value=%s (response: %s, cyclic_sending: %s)",
+                self.name,
+                value,
+                response,
+                self.cyclic_sending,
+            )
             await self.param_value.set(value, response=response)
+            # if response:  # TODO necessary?
+            #     self.last_sent_value = value
 
     async def process_group_read(self, telegram):
         """Process incoming GROUP READ telegram."""
-        _LOGGER.info("HtDataPoint.process_group_read: %s", telegram)
+        _LOGGER.info("HtDataPoint('%s').process_group_read: %s", self.name, telegram)
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """Process incoming GROUP WRITE telegram."""
-        _LOGGER.info("HtDataPoint.process_group_write: %s", telegram)
+        _LOGGER.info("HtDataPoint('%s').process_group_write: %s", self.name, telegram)
         if await self.param_value.process(telegram):
             value = self.param_value.value
             if not self.writable:
@@ -113,9 +120,10 @@ class HtDataPoint(Device):
                     value,
                 )
                 return
-            # TODO ht_heatpump.set_param_async() in try-block
+            # TODO await ht_heatpump.set_param_async() in try-block
             _LOGGER.info(
-                "HtDataPoint.process_group_write: ht_heatpump.set_param_async('%s', %s)",
+                "HtDataPoint('%s').process_group_write: ht_heatpump.set_param_async('%s', %s)",
+                self.name,
                 self.name,
                 value,
             )
@@ -123,23 +131,32 @@ class HtDataPoint(Device):
             self.param_value.payload = self.param_value.to_knx(value)
 
     async def set(self, value):
-        """Set new value and send it to the KNX bus, if desired."""
+        """Set new value and send it to the KNX bus if desired."""
         if value is None:
             return
         # TODO on_change_of_relative / on_change_of_absolute
-        if (
-            isinstance(self.param_value, RemoteValueSwitch)
-            and value != self.param_value.value
-        ):
+        if isinstance(self.param_value, RemoteValueSwitch):
+            _LOGGER.info(
+                "HtDataPoint('%s').set: value=%s (send_on_change: %s, last_sent_value: %s)",
+                self.name,
+                value,
+                self.send_on_change,
+                self.last_sent_value,
+            )
             if self.send_on_change:
                 await self.param_value.set(value)
                 self.last_sent_value = value
             else:
                 self.param_value.payload = self.param_value.to_knx(value)
-        elif (
-            isinstance(self.param_value, RemoteValueSensor)
-            and value != self.param_value.value
-        ):
+        elif isinstance(self.param_value, RemoteValueSensor):
+            _LOGGER.info(
+                "HtDataPoint('%s').set: value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
+                self.name,
+                value,
+                self.send_on_change,
+                self.on_change_of,
+                self.last_sent_value,
+            )
             if self.send_on_change and (
                 self.on_change_of is None
                 or self.last_sent_value is None
@@ -162,7 +179,7 @@ class HtDataPoint(Device):
         """Return object as readable string."""
         return (
             '<HtDataPoint name="{}" group_address="{}" value_type="{}" value="{}" unit="{}"'
-            ' writable="{}" cyclic_sending="{}" send_on_change="{}" on_change_of="{}"/>'
+            ' writable="{}" cyclic_sending="{}" send_on_change="{}" on_change_of="{}" last_sent_value="{}"/>'
         ).format(
             self.name,
             self.param_value.group_address,
@@ -175,4 +192,5 @@ class HtDataPoint(Device):
             "yes" if self.cyclic_sending else "no",
             "yes" if self.send_on_change else "no",
             self.on_change_of,
+            self.last_sent_value,
         )

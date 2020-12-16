@@ -1,20 +1,25 @@
 # Sample configuration
 
 general:
-  own_address: '15.15.250'
-  rate_limit: 20
   update_interval:
     seconds: 3
   cyclic_sending_interval:
-    seconds: 5
+    seconds: 6
 
-connection:
+heat_pump:
+  device: /dev/ttyUSB0
+  baudrate: 115200
+  param_verification: True
+
+knx:
   gateway_ip: '192.168.11.81'
   gateway_port: 3671
-  local_ip: '192.168.11.156'
   auto_reconnect: True
   auto_reconnect_wait:
       minutes: 3
+  local_ip: '192.168.11.156'      
+  own_address: '15.15.250'
+  rate_limit: 20
 
 data_points:
   'HKR Soll_Raum':

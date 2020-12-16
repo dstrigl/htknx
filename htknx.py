@@ -24,41 +24,65 @@ import logging
 import pprint
 
 from xknx import XKNX
+from xknx.devices import Notification
 from datetime import timedelta
+from typing import Dict, Optional
 
 from config import Config
+from htdatapoint import HtDataPoint
 
 _LOGGER = logging.getLogger(__name__)
 
 
-# TODO HtParamCache (performs the write and the cyclic update; stores the values in a dict)
+class HtPublisher:
+    """Class for periodically updating and publishing Heliotherm heat pump data points."""
 
-
-class HtParamCache:
-    """TODO"""
-
-    def __init__(self, config: Config):
-        """Initialize the HtParamCache class."""
-        self._update_task = self._create_update_task(config.update_interval)
-        self._publish_task = self._create_publish_task(config.publish_interval)
-        self._data_points = config.data_points
-        self._notifications = config.notifications
+    def __init__(self, update_interval: timedelta, cyclic_sending_interval: timedelta):
+        """Initialize the HtPublisher class."""
+        self._update_interval = update_interval
+        self._cyclic_sending_interval = cyclic_sending_interval
+        self._update_task: Optional[asyncio.Task] = None
+        self._cyclic_sending_task: Optional[asyncio.Task] = None
 
     def __del__(self):
-        """Destructor. Cleaning up if this was not done before."""
-        if self._update_task:
-            self._update_task.cancel()
-        if self._publish_task:
-            self._publish_task.cancel()
+        """Destructor, cleaning up if this was not done before."""
+        self.stop()
 
-    def _create_update_task(self, update_interval: timedelta):
+    def start(self) -> None:
+        """Start the HtPublisher."""
+        if self._update_task is None:
+            self._update_task = self._create_update_task(self._update_interval)
+        if self._cyclic_sending_task is None:
+            self._cyclic_sending_task = self._create_cyclic_sending_task(
+                self._cyclic_sending_interval
+            )
+
+    def stop(self) -> None:
+        """Stop the HtPublisher."""
+        if self._update_task is not None:
+            self._update_task.cancel()
+            self._update_task = None
+        if self._cyclic_sending_task is not None:
+            self._cyclic_sending_task.cancel()
+            self._cyclic_sending_task = None
+
+    def __enter__(self) -> "HtPublisher":
+        """Start the HtPublisher from context manager."""
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        """Stop the HtPublisher from context manager."""
+        self.stop()
+
+    def _create_update_task(self, update_interval: timedelta) -> Optional[asyncio.Task]:
         """Create an asyncio.Task for updating the heat pump parameter values periodically."""
 
         async def update_loop(self, update_interval: timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
                 # TODO
-                _LOGGER.info("update")
+                _LOGGER.info("*** update ***")
                 await asyncio.sleep(update_interval.total_seconds())
 
         if update_interval.total_seconds() > 0:
@@ -66,37 +90,60 @@ class HtParamCache:
             return loop.create_task(update_loop(self, update_interval=update_interval))
         return None
 
-    def _create_publish_task(self, publish_interval: timedelta):
-        """Create an asyncio.Task for publishing the heat pump parameter values periodically."""
+    def _create_cyclic_sending_task(
+        self, cyclic_sending_interval: timedelta
+    ) -> Optional[asyncio.Task]:
+        """Create an asyncio.Task for sending the heat pump parameter values periodically to the KNX bus."""
 
-        async def publish_loop(self, publish_interval: timedelta):
-            """Endless loop for publishing the heat pump parameter values."""
+        async def cyclic_sending_loop(self, cyclic_sending_interval: timedelta):
+            """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
                 # TODO
-                _LOGGER.info("publish")
-                await asyncio.sleep(publish_interval.total_seconds())
+                _LOGGER.info("*** cyclic_sending ***")
+                await asyncio.sleep(cyclic_sending_interval.total_seconds())
 
-        if publish_interval.total_seconds() > 0:
+        if cyclic_sending_interval.total_seconds() > 0:
             loop = asyncio.get_event_loop()
             return loop.create_task(
-                publish_loop(self, publish_interval=publish_interval)
+                cyclic_sending_loop(
+                    self, cyclic_sending_interval=cyclic_sending_interval
+                )
             )
         return None
 
 
 async def main():
-    # activate logging with level DEBUG
+    # activate logging with level INFO
     log_format = "%(asctime)s %(levelname)s [%(name)s|%(funcName)s]: %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_format)
 
-    xknx = XKNX()
-    config = Config(xknx)
+    config = Config()
     config.read("htknx.yaml")
-    pprint.pprint(config.__dict__)
+    # pprint.pprint(config.__dict__)
 
-    param_cache = HtParamCache(config)
+    pprint.pprint(config.heat_pump)
+    pprint.pprint(config.knx)
+    pprint.pprint(config.data_points)
+    pprint.pprint(config.notifications)
+
+    xknx = XKNX(**config.knx)
+
+    # create data points
+    data_points: Dict[str, HtDataPoint] = {}
+    for dp_name, dp_conf in config.data_points.items():
+        data_points[dp_name] = HtDataPoint.from_config(xknx, dp_name, dp_conf)
+
+    # create notifications
+    notifications: Dict[str, Notification] = {}
+    for notif_name, notif_conf in config.notifications.items():
+        notifications[notif_name] = Notification.from_config(
+            xknx, notif_name, notif_conf
+        )
+
+    publisher = HtPublisher(**config.general)
 
     await xknx.start()
+    publisher.start()
     # Wait until Ctrl-C was pressed
     await xknx.loop_until_sigint()
     await xknx.stop()
