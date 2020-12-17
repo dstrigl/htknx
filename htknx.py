@@ -128,11 +128,11 @@ class HtPublisher:
             while True:
                 _LOGGER.info("*** CYCLIC SENDING run ***")
                 _LOGGER.info(
-                    (
+                    [
                         name
                         for name, dp in self._data_points.items()
                         if dp.cyclic_sending
-                    )
+                    ]
                 )
                 # broadcast the data point values to the KNX bus
                 for dp in self._data_points.values():
