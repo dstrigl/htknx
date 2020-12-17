@@ -94,15 +94,16 @@ class HtDataPoint(Device):
             value = self.param_value.value
             # TODO remove!
             value = True if isinstance(self.param_value, RemoteValueSwitch) else 125
-            if value is None:
-                return
-            _LOGGER.info(
-                "HtDataPoint('%s').broadcast_value: value=%s (response: %s, cyclic_sending: %s)",
+            # ---
+            _LOGGER.debug(
+                "broadcast data point '%s': value=%s (response: %s, cyclic_sending: %s)",
                 self.name,
                 value,
                 response,
                 self.cyclic_sending,
             )
+            if value is None:
+                return
             await self.param_value.set(value, response=response)
             # if response:  # TODO necessary?
             #     self.last_sent_value = value
@@ -111,14 +112,12 @@ class HtDataPoint(Device):
         """Process incoming GROUP READ telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
-        _LOGGER.info("HtDataPoint('%s').process_group_read: %s", self.name, telegram)
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """Process incoming GROUP WRITE telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
-        _LOGGER.info("HtDataPoint('%s').process_group_write: %s", self.name, telegram)
         if await self.param_value.process(telegram):
             value = self.param_value.value
             if not self.writable:
@@ -129,12 +128,6 @@ class HtDataPoint(Device):
                 )
                 return
             try:
-                _LOGGER.info(
-                    "HtDataPoint('%s').process_group_write: hthp.set_param_async('%s', %s)",
-                    self.name,
-                    self.name,
-                    value,
-                )
                 value = await self.hthp.set_param_async(self.name, value)
                 self.param_value.payload = self.param_value.to_knx(value)
             except Exception as ex:
@@ -145,8 +138,8 @@ class HtDataPoint(Device):
         if value is None:
             return
         if isinstance(self.param_value, RemoteValueSwitch):
-            _LOGGER.info(
-                "HtDataPoint('%s').set: value=%s (send_on_change: %s, last_sent_value: %s)",
+            _LOGGER.debug(
+                "set data point '%s': value=%s (send_on_change: %s, last_sent_value: %s)",
                 self.name,
                 value,
                 self.send_on_change,
@@ -158,8 +151,8 @@ class HtDataPoint(Device):
             else:
                 self.param_value.payload = self.param_value.to_knx(value)
         elif isinstance(self.param_value, RemoteValueSensor):
-            _LOGGER.info(
-                "HtDataPoint('%s').set: value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
+            _LOGGER.debug(
+                "set data point '%s': value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
                 self.name,
                 value,
                 self.send_on_change,
@@ -176,6 +169,8 @@ class HtDataPoint(Device):
                 self.last_sent_value = value
             else:
                 self.param_value.payload = self.param_value.to_knx(value)
+        else:
+            assert 0, "invalid param_value type"
 
     def unit_of_measurement(self):
         """Return the unit of measurement."""

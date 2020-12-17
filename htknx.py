@@ -19,9 +19,13 @@
 
 """ TODO """
 
+import os
 import asyncio
 import logging
+import logging.config
 import pprint
+import argparse
+import textwrap
 
 from xknx import XKNX
 from xknx.devices import Notification
@@ -94,14 +98,14 @@ class HtPublisher:
         async def update_loop(self, update_interval: timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
-                _LOGGER.info("*** update ***")  # TODO remove!
+                _LOGGER.info("*** UPDATE run ***")
                 # check for notifications
                 for notif in self._notifications.values():
                     await notif.do()
                 # update the data point values
                 try:
                     params = await self._hthp.query_async(*self._data_points.keys())
-                    # TODO log
+                    _LOGGER.debug("%s", params)
                     for name, value in params.items():
                         await self._data_points[name].set(value)
                 except Exception as ex:
@@ -122,7 +126,7 @@ class HtPublisher:
         async def cyclic_sending_loop(self, cyclic_sending_interval: timedelta):
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
-                _LOGGER.info("*** cyclic_sending ***")  # TODO remove!
+                _LOGGER.info("*** CYCLIC SENDING run ***")
                 # broadcast the data point values to the KNX bus
                 for dp in self._data_points.values():
                     await dp.broadcast_value()
@@ -140,23 +144,68 @@ class HtPublisher:
 
 
 async def main():
-    # activate logging with level INFO
-    log_format = "%(asctime)s %(levelname)s [%(name)s|%(funcName)s]: %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_format)
+    parser = argparse.ArgumentParser(
+        description=textwrap.dedent(
+            """\
+            Heliotherm heat pump KNX gateway
+            """
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent(
+            """\
+            DISCLAIMER
+            ----------
+              Please note that any incorrect or careless usage of this program as well as
+              errors in the implementation can damage your heat pump!
+              Therefore, the author does not provide any guarantee or warranty concerning
+              to correctness, functionality or performance and does not accept any liability
+              for damage caused by this program or mentioned information.
+              Thus, use it on your own risk!
+            """
+        )
+        + "\r\n",
+    )
+
+    parser.add_argument(
+        "config_file",
+        default=os.path.normpath(os.path.join(os.path.dirname(__file__), "htknx.yaml")),
+        type=str,
+        nargs="?",
+        help="the filename under which the gateway settings can be found, default: %(default)s",
+    )
+
+    parser.add_argument(
+        "--logging-config",
+        default=os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "logging.conf")
+        ),
+        type=str,
+        help="the filename under which the logging configuration can be found, default: %(default)s",
+    )
+
+    args = parser.parse_args()
+    print(args)
+
+    # load logging config from file
+    logging.config.fileConfig(args.logging_config, disable_existing_loggers=False)
+
+    _LOGGER.info(
+        "Start Heliotherm heat pump KNX gateway v%s.", "0.1"  # __version__
+    )  # TODO __version__
 
     config = Config()
-    config.read("htknx.yaml")
-    _LOGGER.info("config: %s", config.__dict__)
+    _LOGGER.info("Load settings from '%s'.", args.config_file)
+    config.read(args.config_file)
+    _LOGGER.debug("config: %s", config.__dict__)
 
     hthp = HtHeatpump(**config.heat_pump)
-    _LOGGER.info("hthp: %s", hthp.__dict__)
     xknx = XKNX(**config.knx)
-    _LOGGER.info("xknx: %s", xknx.__dict__)
 
     # create data points
     data_points: Dict[str, HtDataPoint] = {}
     for dp_name, dp_conf in config.data_points.items():
         data_points[dp_name] = HtDataPoint.from_config(xknx, hthp, dp_name, dp_conf)
+        _LOGGER.debug("data point: %s", data_points[dp_name])
 
     # create notifications
     notifications: Dict[str, Type[Notification]] = {}
@@ -165,6 +214,7 @@ async def main():
             notifications[notif_name] = HtFaultNotification.from_config(
                 xknx, hthp, notif_name, notif_conf
             )
+            _LOGGER.debug("notification: %s", notifications[notif_name])
         else:
             _LOGGER.error("invalid notification '%s'", notif_name)
             assert 0, "invalid notification"

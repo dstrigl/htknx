@@ -9,7 +9,7 @@ from xknx import XKNX
 from xknx.devices import Notification
 from htheatpump import HtHeatpump
 from datetime import timedelta, datetime
-from typing import Union
+from typing import Optional
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class HtFaultNotification(Notification):
         hthp: HtHeatpump,
         name: str,
         group_address,
-        repeat_after: Union[None, timedelta],
+        repeat_after: Optional[timedelta],
         device_updated_cb=None,
     ):
         """Initialize HtFaultNotification class."""
@@ -53,9 +53,10 @@ class HtFaultNotification(Notification):
                     self.repeat_after is not None
                     and datetime.now() - self.last_sent_at >= self.repeat_after
                 ):
+                    _LOGGER.info("HEAT PUMP in ERROR")
                     # query for the last fault message of the heat pump
                     idx, err, dt, msg = await self.hthp.get_last_fault_async()
-                    # TODO log
+                    _LOGGER.info("#%s [%s]: %s, %s", idx, dt.isoformat(), err, msg)
                     # and send it as notification on the KNX bus
                     self.set(msg)
 

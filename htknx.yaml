@@ -2,10 +2,10 @@
 
 general:
   update_interval:
-    seconds: 10
+    seconds: 5
   cyclic_sending_interval:
-    #seconds: 1
-    milliseconds: 100
+    seconds: 10
+    #milliseconds: 100
 
 heat_pump:
   device: /dev/ttyUSB0
@@ -19,8 +19,8 @@ knx:
       minutes: 3
   local_ip: '192.168.11.156'
 #  local_ip: '192.168.11.140'
-  own_address: '15.15.250'
-  rate_limit: 20
+#  own_address: '15.15.250'
+#  rate_limit: 20
 
 data_points:
   'HKR Soll_Raum':
