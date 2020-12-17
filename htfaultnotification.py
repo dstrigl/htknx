@@ -60,7 +60,12 @@ class HtFaultNotification(Notification):
                     # query for the last fault message of the heat pump
                     idx, err, dt, msg = await self.hthp.get_last_fault_async()
                     _LOGGER.info(
-                        "ERROR #%s [%s]: %s, %s", idx, dt.isoformat(), err, msg
+                        "ERROR #%s [%s]: %s, %s%s",
+                        idx,
+                        dt.isoformat(),
+                        err,
+                        msg,
+                        " (repeated)" if self.in_error else "",
                     )
                     # and send it as notification on the KNX bus
                     await self.set(msg)
