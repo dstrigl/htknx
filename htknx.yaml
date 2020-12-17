@@ -45,8 +45,7 @@ data_points:
     group_address: '1/2/5'
     writable: true
   'Frischwasserpumpe':
-#    value_type: 'DPT-5.001'  # 'percentU8'
-    value_type: 'DPT-5'  # '1byte_unsigned'
+    value_type: 'percentU8'  # 'percentU8'
     group_address: '1/2/6'
     send_on_change: true
     on_change_of: 1
