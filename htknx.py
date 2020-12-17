@@ -108,7 +108,7 @@ class HtPublisher:
         async def login_loop(self, login_interval: timedelta):
             """Endless loop to periodically login to the heat pump."""
             while True:
-                _LOGGER.info("<<< [ LOGIN ] >>>")
+                _LOGGER.info("<<< [ LOGIN all %s] >>>", login_interval)
                 try:
                     await self._hthp.login_async()
                 except Exception as ex:
@@ -127,7 +127,7 @@ class HtPublisher:
         async def update_loop(self, update_interval: timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
-                _LOGGER.info("<<< [ UPDATE ] >>>")
+                _LOGGER.info("<<< [ UPDATE all %s] >>>", update_interval)
                 # check for notifications
                 for notif in self._notifications.values():
                     await notif.do()
@@ -155,7 +155,9 @@ class HtPublisher:
         async def cyclic_sending_loop(self, cyclic_sending_interval: timedelta):
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
-                _LOGGER.info("<<< [ CYCLIC SENDING ] >>>")
+                _LOGGER.info(
+                    "<<< [ CYCLIC SENDING all %s] >>>", cyclic_sending_interval
+                )
                 _LOGGER.info(
                     [
                         name
@@ -242,7 +244,7 @@ async def main():
     data_points: Dict[str, HtDataPoint] = {}
     for dp_name, dp_conf in config.data_points.items():
         data_points[dp_name] = HtDataPoint.from_config(xknx, hthp, dp_name, dp_conf)
-        _LOGGER.debug("data point: %s", data_points[dp_name])
+        _LOGGER.debug("DP: %s", data_points[dp_name])
 
     # create notifications
     notifications: Dict[str, Type[Notification]] = {}
@@ -251,7 +253,7 @@ async def main():
             notifications[notif_name] = HtFaultNotification.from_config(
                 xknx, hthp, notif_name, notif_conf
             )
-            _LOGGER.debug("notification: %s", notifications[notif_name])
+            _LOGGER.debug("NOTIF: %s", notifications[notif_name])
         else:
             _LOGGER.warning("invalid notification '%s'", notif_name)
             # assert 0, "invalid notification"
