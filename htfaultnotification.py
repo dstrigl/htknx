@@ -56,16 +56,13 @@ class HtFaultNotification(Notification):
                     self.repeat_after is not None
                     and datetime.now() - self.last_sent_at >= self.repeat_after
                 ):
-                    _LOGGER.info("HEAT PUMP in ERROR")
+                    _LOGGER.info(
+                        "HEAT PUMP in ERROR%s", " (repeated)" if self.in_error else ""
+                    )
                     # query for the last fault message of the heat pump
                     idx, err, dt, msg = await self.hthp.get_last_fault_async()
                     _LOGGER.info(
-                        "ERROR #%s [%s]: %s, %s%s",
-                        idx,
-                        dt.isoformat(),
-                        err,
-                        msg,
-                        " (repeated)" if self.in_error else "",
+                        "ERROR #%s [%s]: %s, %s", idx, dt.isoformat(), err, msg
                     )
                     # and send it as notification on the KNX bus
                     await self.set(msg)
