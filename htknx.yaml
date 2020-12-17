@@ -2,10 +2,9 @@
 
 general:
   update_interval:
-    seconds: 5
+    seconds: 20
   cyclic_sending_interval:
-    seconds: 10
-    #milliseconds: 100
+    seconds: 30
 
 heat_pump:
   device: /dev/ttyUSB0
@@ -17,30 +16,43 @@ knx:
   auto_reconnect: True
   auto_reconnect_wait:
       minutes: 3
-  local_ip: '192.168.11.156'
+#  local_ip: '192.168.11.156'
 #  local_ip: '192.168.11.140'
 #  own_address: '15.15.250'
 #  rate_limit: 20
 
 data_points:
-  'HKR Soll_Raum':
-    value_type: 'temperature'  # 'DPT-9'
-    group_address: '1/2/1'
-    writable: true
   'Stoerung':
     value_type: 'binary'
+    group_address: '1/2/1'
+    send_on_change: true
+  'HKR Soll_Raum':
+    value_type: 'temperature'  # 'DPT-9'
     group_address: '1/2/2'
+    writable: true
     cyclic_sending: true
-  'Temp. Aussen verzoegert':
-    #value_type: 'temperature'  # 'DPT-9'
-    value_type: 'DPT-9'
+  'Temp. Aussen':
+    value_type: 'temperature'  # 'DPT-9'
     group_address: '1/2/3'
+    send_on_change: true
+    on_change_of: 0.2
+  'Temp. Aussen verzoegert':
+    value_type: 'temperature'  # 'DPT-9'
+    group_address: '1/2/4'
     cyclic_sending: true
-    #send_on_change: true
-    #on_change_of: 0.5
+  'Betriebsart':
+    value_type: 'DPT-5'  # '1byte_unsigned'
+    group_address: '1/2/5'
+    writable: true
+  'Frischwasserpumpe':
+    value_type: 'DPT-5.004'  # '1byte_unsigned'
+    group_address: '1/2/6'
+    send_on_change: true
+    on_change_of: 1
 
 notifications:
   on_malfunction:
     group_address: '1/3/1'
-#    repeat_after:
-#      minutes: 10
+    repeat_after:
+      #minutes: 10
+      minutes: 1

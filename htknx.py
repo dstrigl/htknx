@@ -199,6 +199,13 @@ async def main():
     _LOGGER.debug("config: %s", config.__dict__)
 
     hthp = HtHeatpump(**config.heat_pump)
+    hthp.open_connection()
+    await hthp.login_async()
+    rid = await hthp.get_serial_number_async()
+    _LOGGER.info("connected successfully to heat pump with serial number %d", rid)
+    ver = await hthp.get_version_async()
+    _LOGGER.info("software version = %s (%d)", *ver)
+
     xknx = XKNX(**config.knx)
 
     # create data points
@@ -219,13 +226,19 @@ async def main():
             _LOGGER.error("invalid notification '%s'", notif_name)
             assert 0, "invalid notification"
 
-    publisher = HtPublisher(hthp, data_points, notifications, **config.general)
-
     await xknx.start()
+
+    publisher = HtPublisher(hthp, data_points, notifications, **config.general)
     publisher.start()
+
     # Wait until Ctrl-C was pressed
     await xknx.loop_until_sigint()
+
+    publisher.stop()
     await xknx.stop()
+
+    await hthp.logout_async()  # try to logout for an ordinary cancellation (if possible)
+    hthp.close_connection()
 
 
 if __name__ == "__main__":
