@@ -92,9 +92,6 @@ class HtDataPoint(Device):
         """Broadcast parameter value to KNX bus."""
         if response or self.cyclic_sending:
             value = self.param_value.value
-            # TODO remove!
-            # value = True if isinstance(self.param_value, RemoteValueSwitch) else 125
-            # ---
             _LOGGER.debug(
                 "broadcast data point '%s' (%s): value=%s (response: %s, cyclic_sending: %s)",
                 self.name,
@@ -113,17 +110,19 @@ class HtDataPoint(Device):
         """Process incoming GROUP READ telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
+        _LOGGER.info("received incoming GROUP READ telegram: %s", telegram)
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """Process incoming GROUP WRITE telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
+        _LOGGER.info("received incoming GROUP WRITE telegram: %s", telegram)
         if await self.param_value.process(telegram):
             value = self.param_value.value
             if not self.writable:
                 _LOGGER.warning(
-                    "Attempted to set value for non-writable heat pump parameter: '%s' (value: %s)",
+                    "attempted to set value for non-writable heat pump data point: '%s' (value: %s)",
                     self.name,
                     value,
                 )
