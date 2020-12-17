@@ -17,7 +17,8 @@ knx:
   auto_reconnect: True
   auto_reconnect_wait:
       minutes: 3
-  local_ip: '192.168.11.156'      
+  local_ip: '192.168.11.156'
+#  local_ip: '192.168.11.140'
   own_address: '15.15.250'
   rate_limit: 20
 
@@ -29,7 +30,7 @@ data_points:
   'Stoerung':
     value_type: 'binary'
     group_address: '1/2/2'
-    #cyclic_sending: true
+    cyclic_sending: true
   'Temp. Aussen verzoegert':
     #value_type: 'temperature'  # 'DPT-9'
     value_type: 'DPT-9'

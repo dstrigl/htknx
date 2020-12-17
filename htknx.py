@@ -95,14 +95,18 @@ class HtPublisher:
             """Endless loop for updating the heat pump parameter values."""
             while True:
                 _LOGGER.info("*** update ***")  # TODO remove!
+                # check for notifications
                 for notif in self._notifications.values():
                     await notif.do()
+                # update the data point values
                 try:
                     params = await self._hthp.query_async(*self._data_points.keys())
+                    # TODO log
                     for name, value in params.items():
                         await self._data_points[name].set(value)
                 except Exception as ex:
                     _LOGGER.exception(ex)
+                # wait until next run
                 await asyncio.sleep(update_interval.total_seconds())
 
         if update_interval.total_seconds() > 0:
@@ -119,8 +123,10 @@ class HtPublisher:
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
                 _LOGGER.info("*** cyclic_sending ***")  # TODO remove!
+                # broadcast the data point values to the KNX bus
                 for dp in self._data_points.values():
                     await dp.broadcast_value()
+                # wait until next run
                 await asyncio.sleep(cyclic_sending_interval.total_seconds())
 
         if cyclic_sending_interval.total_seconds() > 0:
@@ -140,10 +146,12 @@ async def main():
 
     config = Config()
     config.read("htknx.yaml")
-    pprint.pprint(config.__dict__)
+    _LOGGER.info("config: %s", config.__dict__)
 
     hthp = HtHeatpump(**config.heat_pump)
+    _LOGGER.info("hthp: %s", hthp.__dict__)
     xknx = XKNX(**config.knx)
+    _LOGGER.info("xknx: %s", xknx.__dict__)
 
     # create data points
     data_points: Dict[str, HtDataPoint] = {}
@@ -157,6 +165,9 @@ async def main():
             notifications[notif_name] = HtFaultNotification.from_config(
                 xknx, hthp, notif_name, notif_conf
             )
+        else:
+            _LOGGER.error("invalid notification '%s'", notif_name)
+            assert 0, "invalid notification"
 
     publisher = HtPublisher(hthp, data_points, notifications, **config.general)
 

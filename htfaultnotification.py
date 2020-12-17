@@ -47,14 +47,18 @@ class HtFaultNotification(Notification):
     async def do(self):
         """Execute the 'do' command."""
         try:
+            # query whether the heat pump is malfunctioning
             if await self.hthp.in_error_async:
                 if not self.in_error or (
                     self.repeat_after is not None
                     and datetime.now() - self.last_sent_at >= self.repeat_after
                 ):
+                    # query for the last fault message of the heat pump
                     idx, err, dt, msg = await self.hthp.get_last_fault_async()
                     # TODO log
+                    # and send it as notification on the KNX bus
                     self.set(msg)
+
                     self.in_error = True
                     self.last_sent_at = datetime.now()
             else:
