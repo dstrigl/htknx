@@ -108,7 +108,7 @@ class HtPublisher:
         async def login_loop(self, login_interval: timedelta):
             """Endless loop to periodically login to the heat pump."""
             while True:
-                _LOGGER.info("<<< [ LOGIN all %s] >>>", login_interval)
+                _LOGGER.info("<<< [ LOGIN all %s ] >>>", login_interval)
                 try:
                     await self._hthp.login_async()
                 except Exception as ex:
@@ -127,7 +127,7 @@ class HtPublisher:
         async def update_loop(self, update_interval: timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
-                _LOGGER.info("<<< [ UPDATE all %s] >>>", update_interval)
+                _LOGGER.info("<<< [ UPDATE all %s ] >>>", update_interval)
                 # check for notifications
                 for notif in self._notifications.values():
                     await notif.do()
@@ -156,7 +156,7 @@ class HtPublisher:
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
                 _LOGGER.info(
-                    "<<< [ CYCLIC SENDING all %s] >>>", cyclic_sending_interval
+                    "<<< [ CYCLIC SENDING all %s ] >>>", cyclic_sending_interval
                 )
                 _LOGGER.info(
                     [
