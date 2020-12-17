@@ -42,7 +42,7 @@ from htfaultnotification import HtFaultNotification
 _LOGGER = logging.getLogger(__name__)
 
 
-DEFAULT_LOGIN_INTERVAL = 30
+DEFAULT_LOGIN_INTERVAL = timedelta(seconds=30)
 
 
 class HtPublisher:
