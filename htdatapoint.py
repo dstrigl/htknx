@@ -96,8 +96,9 @@ class HtDataPoint(Device):
             # value = True if isinstance(self.param_value, RemoteValueSwitch) else 125
             # ---
             _LOGGER.debug(
-                "broadcast data point '%s': value=%s (response: %s, cyclic_sending: %s)",
+                "broadcast data point '%s' (%s): value=%s (response: %s, cyclic_sending: %s)",
                 self.name,
+                self.param_value.group_address,
                 value,
                 response,
                 self.cyclic_sending,
@@ -139,8 +140,9 @@ class HtDataPoint(Device):
             return
         if isinstance(self.param_value, RemoteValueSwitch):
             _LOGGER.debug(
-                "set data point '%s': value=%s (send_on_change: %s, last_sent_value: %s)",
+                "set data point '%s' (%s): value=%s (send_on_change: %s, last_sent_value: %s)",
                 self.name,
+                self.param_value.group_address,
                 value,
                 self.send_on_change,
                 self.last_sent_value,
@@ -152,8 +154,9 @@ class HtDataPoint(Device):
                 self.param_value.payload = self.param_value.to_knx(value)
         elif isinstance(self.param_value, RemoteValueSensor):
             _LOGGER.debug(
-                "set data point '%s': value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
+                "set data point '%s' (%s): value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
                 self.name,
+                self.param_value.group_address,
                 value,
                 self.send_on_change,
                 self.on_change_of,
