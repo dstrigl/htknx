@@ -93,7 +93,7 @@ class HtDataPoint(Device):
         if response or self.cyclic_sending:
             value = self.param_value.value
             # TODO remove!
-            value = True if isinstance(self.param_value, RemoteValueSwitch) else 125
+            # value = True if isinstance(self.param_value, RemoteValueSwitch) else 125
             # ---
             _LOGGER.debug(
                 "broadcast data point '%s': value=%s (response: %s, cyclic_sending: %s)",
