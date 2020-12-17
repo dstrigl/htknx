@@ -93,7 +93,7 @@ class HtDataPoint(Device):
         if response or self.cyclic_sending:
             value = self.param_value.value
             _LOGGER.debug(
-                "broadcast data point '%s' (%s): value=%s (response: %s, cyclic_sending: %s)",
+                "broadcast DP '%s' (%s): value=%s (response: %s, cyclic_sending: %s)",
                 self.name,
                 self.param_value.group_address,
                 value,
@@ -110,19 +110,29 @@ class HtDataPoint(Device):
         """Process incoming GROUP READ telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
-        _LOGGER.info("received GROUP READ telegram: %s", telegram)
+        _LOGGER.info(
+            "received GROUP READ telegram for DP '%s' (%s): %s",
+            self.name,
+            self.param_value.group_address,
+            telegram,
+        )
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """Process incoming GROUP WRITE telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
-        _LOGGER.info("received GROUP WRITE telegram: %s", telegram)
+        _LOGGER.info(
+            "received GROUP WRITE telegram for DP '%s' (%s): %s",
+            self.name,
+            self.param_value.group_address,
+            telegram,
+        )
         if await self.param_value.process(telegram):
             value = self.param_value.value
             if not self.writable:
                 _LOGGER.warning(
-                    "attempted to set value for non-writable heat pump data point: '%s' (value: %s)",
+                    "attempted to set value for non-writable heat pump DP '%s' (value: %s)",
                     self.name,
                     value,
                 )
@@ -139,7 +149,7 @@ class HtDataPoint(Device):
             return
         if isinstance(self.param_value, RemoteValueSwitch):
             _LOGGER.debug(
-                "set data point '%s' (%s): value=%s (send_on_change: %s, last_sent_value: %s)",
+                "set DP '%s' (%s): value=%s (send_on_change: %s, last_sent_value: %s)",
                 self.name,
                 self.param_value.group_address,
                 value,
@@ -153,7 +163,7 @@ class HtDataPoint(Device):
                 self.param_value.payload = self.param_value.to_knx(value)
         elif isinstance(self.param_value, RemoteValueSensor):
             _LOGGER.debug(
-                "set data point '%s' (%s): value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
+                "set DP '%s' (%s): value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
                 self.name,
                 self.param_value.group_address,
                 value,

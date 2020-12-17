@@ -59,7 +59,9 @@ class HtFaultNotification(Notification):
                     _LOGGER.info("HEAT PUMP in ERROR")
                     # query for the last fault message of the heat pump
                     idx, err, dt, msg = await self.hthp.get_last_fault_async()
-                    _LOGGER.info("#%s [%s]: %s, %s", idx, dt.isoformat(), err, msg)
+                    _LOGGER.info(
+                        "ERROR #%s [%s]: %s, %s", idx, dt.isoformat(), err, msg
+                    )
                     # and send it as notification on the KNX bus
                     await self.set(msg)
 

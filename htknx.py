@@ -20,6 +20,7 @@
 """ TODO """
 
 import os
+import sys
 import asyncio
 import logging
 import logging.config
@@ -41,6 +42,9 @@ from htfaultnotification import HtFaultNotification
 _LOGGER = logging.getLogger(__name__)
 
 
+DEFAULT_LOGIN_INTERVAL = 30
+
+
 class HtPublisher:
     """Class for periodically updating and publishing Heliotherm heat pump data points."""
 
@@ -58,6 +62,7 @@ class HtPublisher:
         self._notifications = notifications
         self._update_interval = update_interval
         self._cyclic_sending_interval = cyclic_sending_interval
+        self._login_task: Optional[asyncio.Task] = None
         self._update_task: Optional[asyncio.Task] = None
         self._cyclic_sending_task: Optional[asyncio.Task] = None
 
@@ -67,6 +72,8 @@ class HtPublisher:
 
     def start(self) -> None:
         """Start the HtPublisher."""
+        if self._login_task is None:
+            self._login_task = self._create_login_task(DEFAULT_LOGIN_INTERVAL)
         if self._update_task is None:
             self._update_task = self._create_update_task(self._update_interval)
         if self._cyclic_sending_task is None:
@@ -76,6 +83,9 @@ class HtPublisher:
 
     def stop(self) -> None:
         """Stop the HtPublisher."""
+        if self._login_task is not None:
+            self._login_task.cancel()
+            self._login_task = None
         if self._update_task is not None:
             self._update_task.cancel()
             self._update_task = None
@@ -92,20 +102,39 @@ class HtPublisher:
         """Stop the HtPublisher from context manager."""
         self.stop()
 
+    def _create_login_task(self, login_interval: timedelta) -> Optional[asyncio.Task]:
+        """Create an asyncio.Task to periodically login to the heat pump."""
+
+        async def login_loop(self, login_interval: timedelta):
+            """Endless loop to periodically login to the heat pump."""
+            while True:
+                _LOGGER.info("<<< [ LOGIN ] >>>")
+                try:
+                    await self._hthp.login_async()
+                except Exception as ex:
+                    _LOGGER.exception(ex)
+                # wait until next run
+                await asyncio.sleep(login_interval.total_seconds())
+
+        if login_interval.total_seconds() > 0:
+            loop = asyncio.get_event_loop()
+            return loop.create_task(login_loop(self, login_interval=login_interval))
+        return None
+
     def _create_update_task(self, update_interval: timedelta) -> Optional[asyncio.Task]:
         """Create an asyncio.Task for updating the heat pump parameter values periodically."""
 
         async def update_loop(self, update_interval: timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
-                _LOGGER.info("*** UPDATE run ***")
+                _LOGGER.info("<<< [ UPDATE ] >>>")
                 # check for notifications
                 for notif in self._notifications.values():
                     await notif.do()
                 # update the data point values
                 try:
                     params = await self._hthp.query_async(*self._data_points.keys())
-                    _LOGGER.debug("%s", params)
+                    _LOGGER.info(params)
                     for name, value in params.items():
                         await self._data_points[name].set(value)
                 except Exception as ex:
@@ -126,7 +155,7 @@ class HtPublisher:
         async def cyclic_sending_loop(self, cyclic_sending_interval: timedelta):
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
-                _LOGGER.info("*** CYCLIC SENDING run ***")
+                _LOGGER.info("<<< [ CYCLIC SENDING ] >>>")
                 _LOGGER.info(
                     [
                         name
@@ -172,7 +201,6 @@ async def main():
         )
         + "\r\n",
     )
-
     parser.add_argument(
         "config_file",
         default=os.path.normpath(os.path.join(os.path.dirname(__file__), "htknx.yaml")),
@@ -180,7 +208,6 @@ async def main():
         nargs="?",
         help="the filename under which the gateway settings can be found, default: %(default)s",
     )
-
     parser.add_argument(
         "--logging-config",
         default=os.path.normpath(
@@ -190,6 +217,7 @@ async def main():
         help="the filename under which the logging configuration can be found, default: %(default)s",
     )
 
+    # parse the passed arguments
     args = parser.parse_args()
     print(args)
 
@@ -200,19 +228,14 @@ async def main():
         "Start Heliotherm heat pump KNX gateway v%s.", "0.1"  # __version__
     )  # TODO __version__
 
+    # load the settings from the config file
     config = Config()
     _LOGGER.info("Load settings from '%s'.", args.config_file)
     config.read(args.config_file)
     _LOGGER.debug("config: %s", config.__dict__)
 
+    # create objects to establish connection to the heat pump and the KNX bus
     hthp = HtHeatpump(**config.heat_pump)
-    hthp.open_connection()
-    await hthp.login_async()
-    rid = await hthp.get_serial_number_async()
-    _LOGGER.info("connected successfully to heat pump with serial number %d", rid)
-    ver = await hthp.get_version_async()
-    _LOGGER.info("software version = %s (%d)", *ver)
-
     xknx = XKNX(**config.knx)
 
     # create data points
@@ -230,22 +253,37 @@ async def main():
             )
             _LOGGER.debug("notification: %s", notifications[notif_name])
         else:
-            _LOGGER.error("invalid notification '%s'", notif_name)
-            assert 0, "invalid notification"
+            _LOGGER.warning("invalid notification '%s'", notif_name)
+            # assert 0, "invalid notification"
 
-    await xknx.start()
+    try:
+        # open the connection to the Heliotherm heat pump and login
+        hthp.open_connection()
+        await hthp.login_async()
+        rid = await hthp.get_serial_number_async()
+        _LOGGER.info("connected successfully to heat pump with serial number %d", rid)
+        ver = await hthp.get_version_async()
+        _LOGGER.info("software version = %s (%d)", *ver)
 
-    publisher = HtPublisher(hthp, data_points, notifications, **config.general)
-    publisher.start()
+        # start the KNX module which connects to the KNX/IP gateway
+        await xknx.start()
 
-    # Wait until Ctrl-C was pressed
-    await xknx.loop_until_sigint()
+        # create and start the publisher
+        with HtPublisher(hthp, data_points, notifications, **config.general):
+            # Wait until Ctrl-C was pressed
+            await xknx.loop_until_sigint()
 
-    publisher.stop()
-    await xknx.stop()
+        # stop the KNX module
+        await xknx.stop()
 
-    await hthp.logout_async()  # try to logout for an ordinary cancellation (if possible)
-    hthp.close_connection()
+    except Exception as ex:
+        _LOGGER.exception(ex)
+        sys.exit(1)
+    finally:
+        await hthp.logout_async()  # try to logout for an ordinary cancellation (if possible)
+        hthp.close_connection()
+
+    sys.exit(0)
 
 
 if __name__ == "__main__":
