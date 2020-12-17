@@ -34,8 +34,9 @@ data_points:
   'Temp. Aussen':
     value_type: 'temperature'  # 'DPT-9'
     group_address: '1/2/3'
-    send_on_change: true
-    on_change_of: 0.1
+#    send_on_change: true
+#    on_change_of: 0.1
+    cyclic_sending: true
   'Temp. Aussen verzoegert':
     value_type: 'temperature'  # 'DPT-9'
     group_address: '1/2/4'
