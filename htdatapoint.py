@@ -110,14 +110,14 @@ class HtDataPoint(Device):
         """Process incoming GROUP READ telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
-        _LOGGER.info("received incoming GROUP READ telegram: %s", telegram)
+        _LOGGER.info("received GROUP READ telegram: %s", telegram)
         await self.broadcast_value(True)
 
     async def process_group_write(self, telegram):
         """Process incoming GROUP WRITE telegram."""
         if telegram.direction == TelegramDirection.OUTGOING:
             return
-        _LOGGER.info("received incoming GROUP WRITE telegram: %s", telegram)
+        _LOGGER.info("received GROUP WRITE telegram: %s", telegram)
         if await self.param_value.process(telegram):
             value = self.param_value.value
             if not self.writable:
