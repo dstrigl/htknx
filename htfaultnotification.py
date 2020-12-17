@@ -61,7 +61,7 @@ class HtFaultNotification(Notification):
                     idx, err, dt, msg = await self.hthp.get_last_fault_async()
                     _LOGGER.info("#%s [%s]: %s, %s", idx, dt.isoformat(), err, msg)
                     # and send it as notification on the KNX bus
-                    self.set(msg)
+                    await self.set(msg)
 
                     self.in_error = True
                     self.last_sent_at = datetime.now()
