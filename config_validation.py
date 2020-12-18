@@ -114,7 +114,15 @@ def positive_timedelta(value: timedelta) -> timedelta:
     return value
 
 
-time_interval = vol.All(time_period, positive_timedelta)
+def timedelta_greater_zero(value: timedelta) -> timedelta:
+    """ Validate timedelta is greater zero (0). """
+    if value <= timedelta(0):
+        raise vol.Invalid("time period should be greater zero")
+    return value
+
+
+# time_interval = vol.All(time_period, positive_timedelta)
+time_interval = vol.All(time_period, timedelta_greater_zero)
 
 
 def string(value: Any) -> str:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" TODO """
+""" Notification to inform about malfunctioning of the Heliotherm heat pump. """
 
 import logging
 
@@ -51,7 +51,7 @@ class HtFaultNotification(Notification):
             # if await self.hthp.in_error_async:
             if (
                 await self.hthp.get_param_async("Zirkulationspumpe WW") == True
-            ):  # TODO remove!
+            ):  # *** TODO remove! ***
                 if not self.in_error or (
                     self.repeat_after is not None
                     and datetime.now() - self.last_sent_at >= self.repeat_after

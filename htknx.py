@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-""" TODO """
+""" Heliotherm heat pump KNX gateway main application. """
 
 import os
 import sys
@@ -108,9 +108,10 @@ class HtPublisher:
         async def login_loop(self, login_interval: timedelta):
             """Endless loop to periodically login to the heat pump."""
             while True:
-                _LOGGER.info("<<< [ LOGIN all %s ] >>>", login_interval)
+                _LOGGER.info("<<< [ LOGIN (every %s) ] >>>", login_interval)
                 try:
                     await self._hthp.login_async()
+                    _LOGGER.info("Login attempt was successful.")
                 except Exception as ex:
                     _LOGGER.exception(ex)
                 # wait until next run
@@ -127,7 +128,7 @@ class HtPublisher:
         async def update_loop(self, update_interval: timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
-                _LOGGER.info("<<< [ UPDATE all %s ] >>>", update_interval)
+                _LOGGER.info("<<< [ UPDATE (every %s) ] >>>", update_interval)
                 # check for notifications
                 for notif in self._notifications.values():
                     await notif.do()
@@ -156,7 +157,7 @@ class HtPublisher:
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
                 _LOGGER.info(
-                    "<<< [ CYCLIC SENDING all %s ] >>>", cyclic_sending_interval
+                    "<<< [ CYCLIC SENDING (every %s) ] >>>", cyclic_sending_interval
                 )
                 _LOGGER.info(
                     [
@@ -234,7 +235,7 @@ async def main():
     config = Config()
     _LOGGER.info("Load settings from '%s'.", args.config_file)
     config.read(args.config_file)
-    _LOGGER.debug("config: %s", config.__dict__)
+    _LOGGER.debug("Config: %s", config.__dict__)
 
     # create objects to establish connection to the heat pump and the KNX bus
     hthp = HtHeatpump(**config.heat_pump)
@@ -255,17 +256,17 @@ async def main():
             )
             _LOGGER.debug("NOTIF: %s", notifications[notif_name])
         else:
-            _LOGGER.warning("invalid notification '%s'", notif_name)
-            # assert 0, "invalid notification"
+            _LOGGER.warning("Invalid notification '%s'", notif_name)
+            # assert 0, "Invalid notification"
 
     try:
         # open the connection to the Heliotherm heat pump and login
         hthp.open_connection()
         await hthp.login_async()
         rid = await hthp.get_serial_number_async()
-        _LOGGER.info("connected successfully to heat pump with serial number %d", rid)
+        _LOGGER.info("Connected successfully to heat pump with serial number %d.", rid)
         ver = await hthp.get_version_async()
-        _LOGGER.info("software version = %s (%d)", *ver)
+        _LOGGER.info("Software version = %s (%d)", *ver)
 
         # start the KNX module which connects to the KNX/IP gateway
         await xknx.start()

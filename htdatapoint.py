@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" TODO """
+""" Representation of a Heliotherm heat pump parameter as a data point. """
 
 import logging
 
@@ -93,7 +93,7 @@ class HtDataPoint(Device):
         if response or self.cyclic_sending:
             value = self.param_value.value
             _LOGGER.debug(
-                "broadcast DP '%s' (%s): value=%s (response: %s, cyclic_sending: %s)",
+                "Broadcast DP '%s' [%s]: value=%s (response: %s, cyclic_sending: %s)",
                 self.name,
                 self.param_value.group_address,
                 value,
@@ -111,7 +111,7 @@ class HtDataPoint(Device):
         if telegram.direction == TelegramDirection.OUTGOING:
             return
         _LOGGER.info(
-            "received GROUP READ telegram for DP '%s' (%s): %s",
+            "Received GROUP READ telegram for DP '%s' [%s]: %s",
             self.name,
             self.param_value.group_address,
             telegram,
@@ -123,7 +123,7 @@ class HtDataPoint(Device):
         if telegram.direction == TelegramDirection.OUTGOING:
             return
         _LOGGER.info(
-            "received GROUP WRITE telegram for DP '%s' (%s): %s",
+            "Received GROUP WRITE telegram for DP '%s' [%s]: %s",
             self.name,
             self.param_value.group_address,
             telegram,
@@ -132,8 +132,9 @@ class HtDataPoint(Device):
             value = self.param_value.value
             if not self.writable:
                 _LOGGER.warning(
-                    "attempted to set value for non-writable heat pump DP '%s' (value: %s)",
+                    "Attempted to set value for non-writable heat pump DP '%s' [%s] (value: %s).",
                     self.name,
+                    self.param_value.group_address,
                     value,
                 )
                 return
@@ -148,29 +149,23 @@ class HtDataPoint(Device):
         if value is None:
             return
         if isinstance(self.param_value, RemoteValueSwitch):
-            _LOGGER.debug(
-                "set DP '%s' (%s): value=%s (send_on_change: %s, last_sent_value: %s)",
-                self.name,
-                self.param_value.group_address,
-                value,
-                self.send_on_change,
-                self.last_sent_value,
-            )
             if self.send_on_change:
                 await self.param_value.set(value)
                 self.last_sent_value = value
+                action = "Updated and sent"
             else:
                 self.param_value.payload = self.param_value.to_knx(value)
-        elif isinstance(self.param_value, RemoteValueSensor):
+                action = "Updated"
             _LOGGER.debug(
-                "set DP '%s' (%s): value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
+                "%s DP '%s' [%s]: value=%s (send_on_change: %s, last_sent_value: %s)",
+                action,
                 self.name,
                 self.param_value.group_address,
                 value,
                 self.send_on_change,
-                self.on_change_of,
                 self.last_sent_value,
             )
+        elif isinstance(self.param_value, RemoteValueSensor):
             # TODO on_change_of_relative / on_change_of_absolute
             if self.send_on_change and (
                 self.on_change_of is None
@@ -179,10 +174,22 @@ class HtDataPoint(Device):
             ):
                 await self.param_value.set(value)
                 self.last_sent_value = value
+                action = "Updated and sent"
             else:
                 self.param_value.payload = self.param_value.to_knx(value)
+                action = "Updated"
+            _LOGGER.debug(
+                "%s DP '%s' [%s]: value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
+                action,
+                self.name,
+                self.param_value.group_address,
+                value,
+                self.send_on_change,
+                self.on_change_of,
+                self.last_sent_value,
+            )
         else:
-            assert 0, "invalid param_value type"
+            assert 0, "Invalid param_value type"
 
     def unit_of_measurement(self):
         """Return the unit of measurement."""

@@ -79,10 +79,10 @@ GENERAL_SCHEMA = vol.Schema(
     {
         vol.Optional(
             CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL
-        ): cv.time_interval,  # TODO > 0
+        ): cv.time_interval,
         vol.Optional(
             CONF_CYCLIC_SENDING_INTERVAL, default=DEFAULT_CYCLIC_SENDING_INTERVAL
-        ): cv.time_interval,  # TODO > 0
+        ): cv.time_interval,
     }
 )
 
@@ -102,7 +102,7 @@ KNX_SCHEMA = vol.Schema(
         vol.Optional(CONF_AUTO_RECONNECT, default=True): cv.boolean,
         vol.Optional(
             CONF_AUTO_RECONNECT_WAIT, default=DEFAULT_AUTO_RECONNECT_WAIT
-        ): cv.time_interval,  # TODO > 0
+        ): cv.time_interval,
         vol.Optional(CONF_LOCAL_IP): cv.string,
         vol.Optional(
             CONF_OWN_ADDRESS, default=XKNX.DEFAULT_ADDRESS
@@ -137,9 +137,7 @@ NOTIFICATION_SCHEMA = vol.Schema(
 
 ON_MALFUNCTION_SCHEMA = NOTIFICATION_SCHEMA.extend(
     {
-        vol.Optional(CONF_REPEAT_AFTER, default=None): vol.Any(
-            cv.time_interval, None
-        ),  # TODO > 0
+        vol.Optional(CONF_REPEAT_AFTER, default=None): vol.Any(cv.time_interval, None),
     }
 )
 
@@ -185,7 +183,7 @@ class Config:
         :param filename: The filename to read the configuration from, e.g. 'htknx.yaml'.
         :type filename: str
         """
-        _LOGGER.debug("reading config file {!r}".format(filename))
+        # _LOGGER.debug("Reading config file '%s'.", filename)
         try:
             with open(filename, "r") as f:
                 doc = yaml.safe_load(f)
@@ -196,7 +194,7 @@ class Config:
                 self._parse_data_points(doc)
                 self._parse_notifications(doc)
         except Exception as e:
-            _LOGGER.error("failed to read config file '{%s}': %s", filename, e)
+            _LOGGER.error("Failed to read config file '{%s}': %s", filename, e)
             raise
 
     def _parse_general_settings(self, doc) -> None:
