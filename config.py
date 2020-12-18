@@ -115,7 +115,7 @@ KNX_SCHEMA = vol.Schema(
 
 DATA_POINT_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_VALUE_TYPE): cv.ensure_knx_dpt,
+        vol.Required(CONF_VALUE_TYPE): vol.Any(cv.ensure_knx_dpt, "binary"),
         vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
         vol.Optional(CONF_WRITABLE, default=False): cv.boolean,
         vol.Optional(CONF_CYCLIC_SENDING, default=False): cv.boolean,
