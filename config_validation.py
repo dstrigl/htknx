@@ -1,11 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#  htknx - Heliotherm heat pump KNX gateway
+#  Copyright (C) 2020  Daniel Strigl
+
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 """ Helpers for config validation using voluptuous. """
 
 from datetime import timedelta
 from numbers import Number
 from re import compile as re_compile
+from xknx.dpt import DPTBase
 from typing import Any, Callable, Dict, List, TypeVar, Union
 
 import voluptuous as vol
@@ -183,5 +200,14 @@ def ensure_physical_address(value: str) -> str:
     value = str(value)
     if not KNX_PA_REGEX.match(value):
         raise vol.Invalid(f"{value} is not a valid physical address")
+
+    return value
+
+
+def ensure_knx_dpt(value: str) -> str:
+    """ Ensure value is a valid KNX DPT. """
+    dpt_class = DPTBase.parse_transcoder(value)
+    if dpt_class is None:
+        raise vol.Invalid(f"{value} is not a valid KNX DPT")
 
     return value

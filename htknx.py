@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#  htknx - TODO
+#  htknx - Heliotherm heat pump KNX gateway
 #  Copyright (C) 2020  Daniel Strigl
 
 #  This program is free software: you can redistribute it and/or modify
@@ -37,6 +37,7 @@ from typing import Dict, Optional, Type
 from config import Config
 from htdatapoint import HtDataPoint
 from htfaultnotification import HtFaultNotification
+from __version__ import __version__
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -227,9 +228,7 @@ async def main():
     # load logging config from file
     logging.config.fileConfig(args.logging_config, disable_existing_loggers=False)
 
-    _LOGGER.info(
-        "Start Heliotherm heat pump KNX gateway v%s.", "0.1"  # __version__
-    )  # TODO __version__
+    _LOGGER.info("Start Heliotherm heat pump KNX gateway v%s.", __version__)
 
     # load the settings from the config file
     config = Config()

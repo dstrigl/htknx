@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#  htknx - TODO
+#  htknx - Heliotherm heat pump KNX gateway
 #  Copyright (C) 2020  Daniel Strigl
 
 #  This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-""" TODO """
+""" Parsing a given config file in YAML format. """
 
 import logging
 import voluptuous as vol
@@ -115,7 +115,7 @@ KNX_SCHEMA = vol.Schema(
 
 DATA_POINT_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_VALUE_TYPE): cv.string,  # TODO validate!
+        vol.Required(CONF_VALUE_TYPE): cv.ensure_knx_dpt,
         vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
         vol.Optional(CONF_WRITABLE, default=False): cv.boolean,
         vol.Optional(CONF_CYCLIC_SENDING, default=False): cv.boolean,
