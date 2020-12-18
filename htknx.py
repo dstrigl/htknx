@@ -136,7 +136,7 @@ class HtPublisher:
                 # update the data point values
                 try:
                     params = await self._hthp.query_async(*self._data_points.keys())
-                    _LOGGER.info(params)
+                    _LOGGER.info("Update: %s", params)
                     for name, value in params.items():
                         await self._data_points[name].set(value)
                 except Exception as ex:
@@ -161,11 +161,12 @@ class HtPublisher:
                     "<<< [ CYCLIC SENDING (every %s) ] >>>", cyclic_sending_interval
                 )
                 _LOGGER.info(
+                    "Sending: %s",
                     [
                         name
                         for name, dp in self._data_points.items()
                         if dp.cyclic_sending
-                    ]
+                    ],
                 )
                 # broadcast the data point values to the KNX bus
                 for dp in self._data_points.values():
