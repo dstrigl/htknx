@@ -1,4 +1,6 @@
+#
 # Sample configuration
+#
 
 general:
   update_interval:

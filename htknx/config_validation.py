@@ -43,6 +43,7 @@ port = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
 
 # Adapted from:
 # https://github.com/alecthomas/voluptuous/issues/115#issuecomment-144464666
+#
 def has_at_least_one_key(*keys: str) -> Callable:
     """ Validate that at least one key exists. """
 

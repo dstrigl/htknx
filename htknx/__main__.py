@@ -34,10 +34,10 @@ from datetime import timedelta
 from htheatpump import HtHeatpump
 from typing import Dict, Optional, Type
 
-from config import Config
-from htdatapoint import HtDataPoint
-from htfaultnotification import HtFaultNotification
-from __version__ import __version__
+from .config import Config
+from .htdatapoint import HtDataPoint
+from .htfaultnotification import HtFaultNotification
+from .__version__ import __version__
 
 
 _LOGGER = logging.getLogger(__name__)
