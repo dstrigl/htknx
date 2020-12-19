@@ -50,7 +50,31 @@ $ python setup.py install
 ## Usage
 
 ```
-TODO
+usage: htknx [-h] [--logging-config LOGGING_CONFIG] [config_file]
+
+Heliotherm heat pump KNX gateway, v0.1.0.
+
+  https://github.com/dstrigl/htknx
+
+positional arguments:
+  config_file           the filename under which the gateway settings can be
+                        found, default: htknx.yaml
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --logging-config LOGGING_CONFIG
+                        the filename under which the logging configuration can
+                        be found, default: logging.conf
+
+DISCLAIMER
+----------
+  Please note that any incorrect or careless usage of this program as well as
+  errors in the implementation can damage your heat pump!
+  Therefore, the author does not provide any guarantee or warranty concerning
+  to correctness, functionality or performance and does not accept any liability
+  for damage caused by this program or mentioned information.
+  Thus, use it on your own risk!
+
 ```
 
 

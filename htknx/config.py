@@ -30,7 +30,7 @@ from htheatpump.htparams import HtParams
 from datetime import timedelta
 from typing import Dict, Any
 
-import config_validation as cv
+from . import config_validation as cv
 
 
 _LOGGER = logging.getLogger(__name__)
