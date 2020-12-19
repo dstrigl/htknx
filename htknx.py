@@ -188,8 +188,12 @@ async def main():
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(
             """\
-            Heliotherm heat pump KNX gateway
-            """
+            Heliotherm heat pump KNX gateway, v{}.
+
+              https://github.com/dstrigl/htknx
+            """.format(
+                __version__
+            )
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent(
