@@ -54,7 +54,6 @@ CONF_OWN_ADDRESS = "own_address"
 CONF_RATE_LIMIT = "rate_limit"
 
 CONF_DATA_POINTS = "data_points"
-CONF_PARAM_NAME = "param_name"
 CONF_VALUE_TYPE = "value_type"
 CONF_GROUP_ADDRESS = "group_address"
 CONF_WRITABLE = "writable"
@@ -225,7 +224,7 @@ class Config:
             if CONF_AUTO_RECONNECT_WAIT in doc[CONF_KNX]:
                 self.knx["connection_config"].auto_reconnect_wait = doc[CONF_KNX][
                     CONF_AUTO_RECONNECT_WAIT
-                ]
+                ].total_seconds()
             if CONF_LOCAL_IP in doc[CONF_KNX]:
                 self.knx["connection_config"].local_ip = doc[CONF_KNX][CONF_LOCAL_IP]
             if CONF_OWN_ADDRESS in doc[CONF_KNX]:
