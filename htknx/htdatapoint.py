@@ -226,7 +226,7 @@ class HtDataPoint(Device):
                 action = "Updated"
             _LOGGER.debug(
                 "%s DP '%s' [%s]: value=%s (send_on_change: %s,"
-                " on_change_of_absolute: %s, on_change_of_relative=%s, last_sent_value: %s)",
+                " on_change_of_absolute: %s, on_change_of_relative: %s, last_sent_value: %s)",
                 action,
                 self.name,
                 self.param_value.group_address,
