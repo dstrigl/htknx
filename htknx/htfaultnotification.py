@@ -64,10 +64,7 @@ class HtFaultNotification(Notification):
         """Execute the 'do' command."""
         try:
             # query whether the heat pump is malfunctioning
-            # if await self.hthp.in_error_async:
-            if (
-                await self.hthp.get_param_async("Zirkulationspumpe WW") == True
-            ):  # *** TODO remove! ***
+            if await self.hthp.in_error_async:
                 if not self.in_error or (
                     self.repeat_after is not None
                     and datetime.now() - self.last_sent_at >= self.repeat_after

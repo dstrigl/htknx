@@ -2,11 +2,11 @@
 #  Sample configuration for Heliotherm heat pump KNX gateway
 # -----------------------------------------------------------
 
-# general:
-#   update_interval:
-#     seconds: 60
-#   cyclic_sending_interval:
-#     seconds: 600
+general:
+  update_interval:
+    seconds: 20
+  cyclic_sending_interval:
+    seconds: 30
 
 heat_pump:
   device: /dev/ttyUSB0
@@ -25,29 +25,29 @@ knx:
 data_points:
   'Stoerung':
     value_type: 'binary'
-    group_address: '1/2/1'
+    group_address: '1/7/1'
+    cyclic_sending: true
   'HKR Soll_Raum':
     value_type: 'temperature'  # 'DPT-9'
-    group_address: '1/2/2'
+    group_address: '1/7/2'
     writable: true
   'Temp. Aussen':
     value_type: 'temperature'  # 'DPT-9'
-    group_address: '1/2/3'
+    group_address: '1/7/3'
+    send_on_change: true
     on_change_of_absolute: 0.1
-    cyclic_sending: true
   'Temp. Aussen verzoegert':
     value_type: 'temperature'  # 'DPT-9'
-    group_address: '1/2/4'
-    on_change_of_absolute: 0.1
+    group_address: '1/7/4'
+    cyclic_sending: true
   'Betriebsart':
     value_type: 'DPT-5'  # '1byte_unsigned'
-    group_address: '1/2/5'
+    group_address: '1/7/5'
     writable: true
   'Frischwasserpumpe':
     value_type: 'percentU8'  # 'percentU8'
-    group_address: '1/2/6'
-#    send_on_change: true
-#    on_change_of_absolute: 0.1
+    group_address: '1/7/6'
+    send_on_change: true
     on_change_of_relative: 10
 
 
