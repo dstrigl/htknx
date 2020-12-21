@@ -189,7 +189,7 @@ class HtDataPoint(Device):
                 elif self.last_sent_value == 0:
                     return False
                 else:
-                    return (self.last_sent_value == 0 and value != 0) or (
+                    return (
                         abs(value - self.last_sent_value) / self.last_sent_value
                     ) * 100 >= abs(self.on_change_of_relative)
             assert 0, "must contain on_change_of_absolute or on_change_of_relative"
