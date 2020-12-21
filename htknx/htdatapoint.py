@@ -198,44 +198,57 @@ class HtDataPoint(Device):
             if self.send_on_change and (
                 self.last_sent_value is None or value != self.last_sent_value
             ):
+                _LOGGER.debug(
+                    "Update and send DP '%s' [%s]: value=%s (send_on_change: %s, last_sent_value: %s)",
+                    self.name,
+                    self.param_value.group_address,
+                    value,
+                    self.send_on_change,
+                    self.last_sent_value,
+                )
                 await self.param_value.set(value)
                 self.last_sent_value = value
-                action = "Updated and sent"
             else:
+                _LOGGER.debug(
+                    "Update DP '%s' [%s]: value=%s (send_on_change: %s, last_sent_value: %s)",
+                    self.name,
+                    self.param_value.group_address,
+                    value,
+                    self.send_on_change,
+                    self.last_sent_value,
+                )
                 self.param_value.payload = self.param_value.to_knx(value)
-                action = "Updated"
-            _LOGGER.debug(
-                "%s DP '%s' [%s]: value=%s (send_on_change: %s, last_sent_value: %s)",
-                action,
-                self.name,
-                self.param_value.group_address,
-                value,
-                self.send_on_change,
-                self.last_sent_value,
-            )
         # numeric value type
         elif isinstance(self.param_value, RemoteValueSensor):
             if self.send_on_change and (
                 self.last_sent_value is None or numeric_value_changed(value)
             ):
+                _LOGGER.debug(
+                    "Update and send DP '%s' [%s]: value=%s (send_on_change: %s,"
+                    " on_change_of_absolute: %s, on_change_of_relative: %s, last_sent_value: %s)",
+                    self.name,
+                    self.param_value.group_address,
+                    value,
+                    self.send_on_change,
+                    self.on_change_of_absolute,
+                    self.on_change_of_relative,
+                    self.last_sent_value,
+                )
                 await self.param_value.set(value)
                 self.last_sent_value = value
-                action = "Updated and sent"
             else:
+                _LOGGER.debug(
+                    "Update DP '%s' [%s]: value=%s (send_on_change: %s,"
+                    " on_change_of_absolute: %s, on_change_of_relative: %s, last_sent_value: %s)",
+                    self.name,
+                    self.param_value.group_address,
+                    value,
+                    self.send_on_change,
+                    self.on_change_of_absolute,
+                    self.on_change_of_relative,
+                    self.last_sent_value,
+                )
                 self.param_value.payload = self.param_value.to_knx(value)
-                action = "Updated"
-            _LOGGER.debug(
-                "%s DP '%s' [%s]: value=%s (send_on_change: %s,"
-                " on_change_of_absolute: %s, on_change_of_relative: %s, last_sent_value: %s)",
-                action,
-                self.name,
-                self.param_value.group_address,
-                value,
-                self.send_on_change,
-                self.on_change_of_absolute,
-                self.on_change_of_relative,
-                self.last_sent_value,
-            )
         # invalid value type
         else:
             assert 0, "Invalid param_value type"
