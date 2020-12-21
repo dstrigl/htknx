@@ -55,7 +55,7 @@ def has_at_least_one_key(*keys: str) -> Callable:
         for k in obj:
             if k in keys:
                 return obj
-        raise vol.Invalid("must contain at least one of {}.".format(", ".join(keys)))
+        raise vol.Invalid("must contain at least one of {}".format(", ".join(keys)))
 
     return validate
 
@@ -175,6 +175,9 @@ def number(value: Any) -> Union[int, float]:
     if type(value) in (int, float):
         return value
     raise vol.Invalid(f"invalid numeric value {value}")
+
+
+number_greater_zero = vol.All(number, vol.Range(min=0, min_included=False))
 
 
 def ensure_list(value: Union[T, List[T], None]) -> List[T]:

@@ -28,7 +28,7 @@ from xknx.io import ConnectionConfig, ConnectionType
 from xknx.telegram import PhysicalAddress
 from htheatpump.htparams import HtParams
 from datetime import timedelta
-from typing import Dict, Any
+from typing import Dict, Any, Callable
 
 from . import config_validation as cv
 
@@ -59,8 +59,8 @@ CONF_GROUP_ADDRESS = "group_address"
 CONF_WRITABLE = "writable"
 CONF_CYCLIC_SENDING = "cyclic_sending"
 CONF_SEND_ON_CHANGE = "send_on_change"
-CONF_ON_CHANGE_OF = "on_change_of"
-# TODO -> on_change_of_relative / on_change_of_absolute
+CONF_ON_CHANGE_OF_ABSOLUTE = "on_change_of_absolute"
+CONF_ON_CHANGE_OF_RELATIVE = "on_change_of_relative"
 
 CONF_NOTIFICATIONS = "notifications"
 CONF_ON_MALFUNCTION = "on_malfunction"
@@ -112,22 +112,94 @@ KNX_SCHEMA = vol.Schema(
     }
 )
 
-DATA_POINT_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_VALUE_TYPE): vol.Any(cv.ensure_knx_dpt, "binary"),
-        vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
-        vol.Optional(CONF_WRITABLE, default=False): cv.boolean,
-        vol.Optional(CONF_CYCLIC_SENDING, default=False): cv.boolean,
-        vol.Optional(CONF_SEND_ON_CHANGE, default=False): cv.boolean,
-        vol.Optional(CONF_ON_CHANGE_OF, default=None): vol.Any(cv.number, None),
-        # TODO CONF_ON_CHANGE_OF only allowed for data points with value type != 'binary' and 'send_on_change' == True
-        # TODO CONF_ON_CHANGE_OF cv.positive_number
-        # TODO -> on_change_of_relative / on_change_of_absolute
-    }
+
+def validate_data_point() -> Callable:
+    """ Ensure that the data point is valid. """
+
+    def validate(obj: Dict) -> Dict:
+        if (
+            obj[CONF_VALUE_TYPE] == "binary"
+            and len({CONF_ON_CHANGE_OF_ABSOLUTE, CONF_ON_CHANGE_OF_RELATIVE} & set(obj))
+            > 0
+        ):
+            raise vol.Invalid(
+                "{} not allowed for binary data point".format(
+                    ", ".join((CONF_ON_CHANGE_OF_ABSOLUTE, CONF_ON_CHANGE_OF_RELATIVE))
+                )
+            )
+        if (
+            obj[CONF_VALUE_TYPE] != "binary"
+            and obj[CONF_SEND_ON_CHANGE]
+            and len({CONF_ON_CHANGE_OF_ABSOLUTE, CONF_ON_CHANGE_OF_RELATIVE} & set(obj))
+            < 1
+        ):
+            raise vol.Invalid(
+                "must contain at least one of {}".format(
+                    ", ".join((CONF_ON_CHANGE_OF_ABSOLUTE, CONF_ON_CHANGE_OF_RELATIVE))
+                )
+            )
+
+        return obj
+
+    return validate
+
+
+DATA_POINT_SCHEMA = vol.All(
+    dict,
+    vol.Schema(
+        {
+            vol.Required(CONF_VALUE_TYPE): vol.Or(cv.ensure_knx_dpt, "binary"),
+            vol.Required(CONF_GROUP_ADDRESS): cv.ensure_group_address,
+            vol.Optional(CONF_WRITABLE, default=False): cv.boolean,
+            vol.Optional(CONF_CYCLIC_SENDING, default=False): cv.boolean,
+            vol.Optional(CONF_SEND_ON_CHANGE, default=False): cv.boolean,
+            vol.Exclusive(
+                CONF_ON_CHANGE_OF_ABSOLUTE,
+                "on_change_of",
+                msg="absolute or relative change",
+            ): cv.number_greater_zero,
+            vol.Exclusive(
+                CONF_ON_CHANGE_OF_RELATIVE,
+                "on_change_of",
+                msg="absolute or relative change",
+            ): cv.number_greater_zero,
+        }
+    ),
+    validate_data_point(),
 )
 
-DATA_POINTS_SCHEMA = vol.Schema(
-    {vol.All(cv.string, vol.In(HtParams.keys())): DATA_POINT_SCHEMA}
+
+def check_for_warnings_in_data_points() -> Callable:
+    """ Check for warnings in the data point config section. """
+
+    def validate(obj: Dict) -> Dict:
+        for name, dp in obj.items():
+            if (
+                dp[CONF_VALUE_TYPE] != "binary"
+                and not dp[CONF_SEND_ON_CHANGE]
+                and len(
+                    {CONF_ON_CHANGE_OF_ABSOLUTE, CONF_ON_CHANGE_OF_RELATIVE} & set(dp)
+                )
+                > 0
+            ):
+                _LOGGER.warning(
+                    "%s is defined, but %s is set to false for data point '%s'",
+                    CONF_ON_CHANGE_OF_ABSOLUTE
+                    if CONF_ON_CHANGE_OF_ABSOLUTE in dp
+                    else CONF_ON_CHANGE_OF_RELATIVE,
+                    CONF_SEND_ON_CHANGE,
+                    name,
+                )
+
+        return obj
+
+    return validate
+
+
+DATA_POINTS_SCHEMA = vol.All(
+    dict,
+    vol.Schema({vol.All(cv.string, vol.In(HtParams.keys())): DATA_POINT_SCHEMA}),
+    check_for_warnings_in_data_points(),
 )
 
 NOTIFICATION_SCHEMA = vol.Schema(

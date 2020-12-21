@@ -112,7 +112,6 @@ class HtPublisher:
                 _LOGGER.info("<<< [ LOGIN (every %s) ] >>>", login_interval)
                 try:
                     await self._hthp.login_async()
-                    _LOGGER.info("Login was successful.")
                 except Exception as ex:
                     _LOGGER.exception(ex)
                 # wait until next run

@@ -46,7 +46,8 @@ class HtDataPoint(Device):
         writable: bool = False,
         cyclic_sending: bool = False,
         send_on_change: bool = False,
-        on_change_of: Union[None, int, float] = None,
+        on_change_of_absolute: Union[None, int, float] = None,
+        on_change_of_relative: Union[None, int, float] = None,
         device_updated_cb=None,
     ):
         """Initialize HtDataPoint class."""
@@ -55,6 +56,7 @@ class HtDataPoint(Device):
 
         self.param_value = None
         if value_type == "binary":
+            assert on_change_of_absolute is None and on_change_of_relative is None
             self.param_value = RemoteValueSwitch(
                 xknx,
                 group_address=group_address,
@@ -63,6 +65,14 @@ class HtDataPoint(Device):
                 after_update_cb=self.after_update,
             )
         else:
+            assert not (
+                on_change_of_absolute is not None and on_change_of_relative is not None
+            )
+            assert (
+                not send_on_change
+                or on_change_of_absolute is not None
+                or on_change_of_relative is not None
+            )
             self.param_value = RemoteValueSensor(
                 xknx,
                 group_address=group_address,
@@ -74,7 +84,8 @@ class HtDataPoint(Device):
         self.writable = writable
         self.cyclic_sending = cyclic_sending
         self.send_on_change = send_on_change
-        self.on_change_of = on_change_of
+        self.on_change_of_absolute = on_change_of_absolute
+        self.on_change_of_relative = on_change_of_relative
         self.last_sent_value: Union[None, bool, int, float] = None
 
     def _iter_remote_values(self):
@@ -89,7 +100,8 @@ class HtDataPoint(Device):
         writable = config.get("writable")
         cyclic_sending = config.get("cyclic_sending")
         send_on_change = config.get("send_on_change")
-        on_change_of = config.get("on_change_of")
+        on_change_of_absolute = config.get("on_change_of_absolute")
+        on_change_of_relative = config.get("on_change_of_relative")
 
         return cls(
             xknx,
@@ -100,7 +112,8 @@ class HtDataPoint(Device):
             writable=writable,
             cyclic_sending=cyclic_sending,
             send_on_change=send_on_change,
-            on_change_of=on_change_of,
+            on_change_of_absolute=on_change_of_absolute,
+            on_change_of_relative=on_change_of_relative,
             device_updated_cb=device_updated_cb,
         )
 
@@ -162,10 +175,28 @@ class HtDataPoint(Device):
 
     async def set(self, value):
         """Set new value and send it to the KNX bus if desired."""
+
+        def numeric_value_changed(value) -> bool:
+            """ Determines whether a numeric value changed or not. """
+            assert self.last_sent_value is not None
+            if self.on_change_of_absolute is not None:
+                return abs(value - self.last_sent_value) >= abs(
+                    self.on_change_of_absolute
+                )
+            elif self.on_change_of_relative is not None:
+                return self.last_sent_value == 0 or (
+                    abs(value - self.last_sent_value) / self.last_sent_value
+                ) * 100 >= abs(self.on_change_of_relative)
+            return False
+
         if value is None:
             return
+
+        # binary value type
         if isinstance(self.param_value, RemoteValueSwitch):
-            if self.send_on_change:
+            if self.send_on_change and (
+                self.last_sent_value is None or value != self.last_sent_value
+            ):
                 await self.param_value.set(value)
                 self.last_sent_value = value
                 action = "Updated and sent"
@@ -181,12 +212,10 @@ class HtDataPoint(Device):
                 self.send_on_change,
                 self.last_sent_value,
             )
+        # numeric value type
         elif isinstance(self.param_value, RemoteValueSensor):
-            # TODO on_change_of_relative / on_change_of_absolute
             if self.send_on_change and (
-                self.on_change_of is None
-                or self.last_sent_value is None
-                or abs(value - self.last_sent_value) >= abs(self.on_change_of)
+                self.last_sent_value is None or numeric_value_changed(value)
             ):
                 await self.param_value.set(value)
                 self.last_sent_value = value
@@ -195,15 +224,18 @@ class HtDataPoint(Device):
                 self.param_value.payload = self.param_value.to_knx(value)
                 action = "Updated"
             _LOGGER.debug(
-                "%s DP '%s' [%s]: value=%s (send_on_change: %s, on_change_of: %s, last_sent_value: %s)",
+                "%s DP '%s' [%s]: value=%s (send_on_change: %s,"
+                " on_change_of_absolute: %s, on_change_of_relative=%s, last_sent_value: %s)",
                 action,
                 self.name,
                 self.param_value.group_address,
                 value,
                 self.send_on_change,
-                self.on_change_of,
+                self.on_change_of_absolute,
+                self.on_change_of_relative,
                 self.last_sent_value,
             )
+        # invalid value type
         else:
             assert 0, "Invalid param_value type"
 
@@ -219,7 +251,8 @@ class HtDataPoint(Device):
         """Return object as readable string."""
         return (
             '<HtDataPoint name="{}" group_address="{}" value_type="{}" value="{}" unit="{}"'
-            ' writable="{}" cyclic_sending="{}" send_on_change="{}" on_change_of="{}" last_sent_value="{}"/>'
+            ' writable="{}" cyclic_sending="{}" send_on_change="{}"'
+            ' on_change_of_absolute="{}" on_change_of_relative="{}" last_sent_value="{}"/>'
         ).format(
             self.name,
             self.param_value.group_address,
@@ -231,6 +264,7 @@ class HtDataPoint(Device):
             "yes" if self.writable else "no",
             "yes" if self.cyclic_sending else "no",
             "yes" if self.send_on_change else "no",
-            self.on_change_of,
+            self.on_change_of_absolute,
+            self.on_change_of_relative,
             self.last_sent_value,
         )
