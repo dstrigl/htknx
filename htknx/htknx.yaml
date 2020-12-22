@@ -132,7 +132,7 @@ data_points:
   #   - DPT-14.000: acceleration (m/s²)
   #   - DPT-14.001: acceleration_angular (rad/s²)
   #   - DPT-14.002: activation_energy (J/mol)
-  #   - DPT-14.003: activity (s⁻¹)
+  #   - DPT-14.003: activity (1/s)
   #   - DPT-14.004: mol (mol)
   #   - DPT-14.005: amplitude
   #   - DPT-14.006: angle_rad (rad)
@@ -464,11 +464,12 @@ data_points:
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/40'
   # -----------------------------------------------------------------
-  'Temp. Pufferspeicher':
-    # MIN: 0.0
-    # MAX: 70.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/41'
+# TODO
+#  'Temp. Pufferspeicher':
+#    # MIN: 0.0
+#    # MAX: 70.0
+#    value_type: 'common_temperature'  # DPT-14.068
+#    group_address: '1/7/41'
   # -----------------------------------------------------------------
   'Temp. EQ_Eintritt':
     # MIN: -20.0
