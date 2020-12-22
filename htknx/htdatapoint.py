@@ -26,7 +26,7 @@ from xknx.devices import Device
 from xknx.remote_value.remote_value_sensor import RemoteValueSensor
 from xknx.remote_value.remote_value_switch import RemoteValueSwitch
 from xknx.telegram import TelegramDirection
-from htheatpump import HtHeatpump
+from htheatpump import HtHeatpump, HtParams, HtDataTypes
 from typing import Union
 
 
@@ -168,6 +168,15 @@ class HtDataPoint(Device):
                 )
                 return
             try:
+                param = HtParams[self.name]
+                if param.dp_type == HtDataTypes.INT:
+                    value = int(value)
+                elif param.dp_type == HtDataTypes.FLOAT:
+                    value = float(value)
+                elif param.dp_type == HtDataTypes.BOOL:
+                    value = bool(value)
+                else:
+                    assert 0, "Invalid dp_type"
                 value = await self.hthp.set_param_async(self.name, value)
                 self.param_value.payload = self.param_value.to_knx(value)
             except Exception as ex:
