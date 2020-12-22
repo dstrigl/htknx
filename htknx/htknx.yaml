@@ -24,194 +24,195 @@ knx:
 
 data_points:
   #
-  # Supported value types:
-  # ----------------------
+  # Supported KNX value types:
+  # --------------------------
   #
-  #   - DPT-01.****: binary
+  #   - DPT-1.***: binary
   #
   #   dpt_4bit_control
   #
-  #   - DPT-03.****: stepwise (%)
-  #   - DPT-03.0007: stepwise_dimming (%)
-  #   - DPT-03.0008: stepwise_blinds (%)
-  #   - DPT-03.****: startstop
-  #   - DPT-03.0007: startstop_dimming
-  #   - DPT-03.0008: startstop_blinds
+  #   - DPT-3.***: stepwise (%)
+  #   - DPT-3.007: stepwise_dimming (%)
+  #   - DPT-3.008: stepwise_blinds (%)
+  #   - DPT-3.***: startstop
+  #   - DPT-3.007: startstop_dimming
+  #   - DPT-3.008: startstop_blinds
   #
   #   dpt_1byte_uint
   #
-  #   - DPT-05.****: 1byte_unsigned
-  #   - DPT-05.0004: percentU8 (%)
-  #   - DPT-05.0005: decimal_factor
-  #   - DPT-05.0006: tariff
-  #   - DPT-05.0010: pulse (counter pulses)
-  #   - DPT-17.0001: scene_number
+  #   - DPT-5.***: 1byte_unsigned
+  #   - DPT-5.004: percentU8 (%)
+  #   - DPT-5.005: decimal_factor
+  #   - DPT-5.006: tariff
+  #   - DPT-5.010: pulse (counter pulses)
+  #   - DPT-17.001: scene_number
   #
   #   dpt_scaling
   #
-  #   - DPT-05.0001: percent (%)
-  #   - DPT-05.0003: angle (°)
+  #   - DPT-5.001: percent (%)
+  #   - DPT-5.003: angle (°)
   #
   #   dpt_1byte_signed
   #
-  #   - DPT-06.****: 1byte_signed
-  #   - DPT-06.0001: percentV8 (%)
-  #   - DPT-06.0010: counter_pulses (counter pulses)
+  #   - DPT-6.***: 1byte_signed
+  #   - DPT-6.001: percentV8 (%)
+  #   - DPT-6.010: counter_pulses (counter pulses)
   #  
   #   dpt_2byte_uint
   #
-  #   - DPT-07.****: 2byte_unsigned
-  #   - DPT-07.0001: pulse_2byte (pulses)
-  #   - DPT-07.0002: time_period_msec (ms)
-  #   - DPT-07.0003: time_period_10msec (ms)
-  #   - DPT-07.0004: time_period_100msec (ms)
-  #   - DPT-07.0005: time_period_sec (s)
-  #   - DPT-07.0006: time_period_min (min)
-  #   - DPT-07.0007: time_period_hrs (h)
-  #   - DPT-07.0011: length_mm (mm)
-  #   - DPT-07.0012: current (mA)
-  #   - DPT-07.0013: brightness (lx)
-  #   - DPT-07.0600: color_temperature (K)
+  #   - DPT-7.***: 2byte_unsigned
+  #   - DPT-7.001: pulse_2byte (pulses)
+  #   - DPT-7.002: time_period_msec (ms)
+  #   - DPT-7.003: time_period_10msec (ms)
+  #   - DPT-7.004: time_period_100msec (ms)
+  #   - DPT-7.005: time_period_sec (s)
+  #   - DPT-7.006: time_period_min (min)
+  #   - DPT-7.007: time_period_hrs (h)
+  #   - DPT-7.011: length_mm (mm)
+  #   - DPT-7.012: current (mA)
+  #   - DPT-7.013: brightness (lx)
+  #   - DPT-7.600: color_temperature (K)
   # 
   #   dpt_2byte_signed
   #
-  #   - DPT-08.****: 2byte_signed
-  #   - DPT-08.0001: pulse_2byte_signed (pulses)
-  #   - DPT-08.0002: delta_time_ms (ms)
-  #   - DPT-08.0003: delta_time_10ms (ms)
-  #   - DPT-08.0004: delta_time_100ms (ms)
-  #   - DPT-08.0005: delta_time_sec (s)
-  #   - DPT-08.0006: delta_time_min (min)
-  #   - DPT-08.0007: delta_time_hrs (h)
-  #   - DPT-08.0010: percentV16 (%)
-  #   - DPT-08.0011: rotation_angle (°)
+  #   - DPT-8.***: 2byte_signed
+  #   - DPT-8.001: pulse_2byte_signed (pulses)
+  #   - DPT-8.002: delta_time_ms (ms)
+  #   - DPT-8.003: delta_time_10ms (ms)
+  #   - DPT-8.004: delta_time_100ms (ms)
+  #   - DPT-8.005: delta_time_sec (s)
+  #   - DPT-8.006: delta_time_min (min)
+  #   - DPT-8.007: delta_time_hrs (h)
+  #   - DPT-8.010: percentV16 (%)
+  #   - DPT-8.011: rotation_angle (°)
   #
   #   dpt_2byte_float
   #
-  #   - DPT-09.****: 2byte_float
-  #   - DPT-09.0001: temperature (°C)
-  #   - DPT-09.0002: temperature_difference_2byte (K)
-  #   - DPT-09.0003: temperature_a (K/h)
-  #   - DPT-09.0004: illuminance (lx)
-  #   - DPT-09.0005: wind_speed_ms (m/s)
-  #   - DPT-09.0006: pressure_2byte (Pa)
-  #   - DPT-09.0007: humidity (%)
-  #   - DPT-09.0008: ppm (ppm)
-  #   - DPT-09.0010: time_1 (s)
-  #   - DPT-09.0011: time_2 (ms)
-  #   - DPT-09.0020: voltage (mV)
-  #   - DPT-09.0021: curr (mA)
-  #   - DPT-09.0022: power_density (W/m²)
-  #   - DPT-09.0023: kelvin_per_percent (K/%)
-  #   - DPT-09.0024: power_2byte (kW)
-  #   - DPT-09.0025: volume_flow (1/h)
-  #   - DPT-09.0026: rain_amount (l/m²)
-  #   - DPT-09.0027: temperature_f (°F)
-  #   - DPT-09.0028: wind_speed_kmh (km/h)
-  #   - DPT-09.****: enthalpy (H)
+  #   - DPT-9.***: 2byte_float
+  #   - DPT-9.001: temperature (°C)
+  #   - DPT-9.002: temperature_difference_2byte (K)
+  #   - DPT-9.003: temperature_a (K/h)
+  #   - DPT-9.004: illuminance (lx)
+  #   - DPT-9.005: wind_speed_ms (m/s)
+  #   - DPT-9.006: pressure_2byte (Pa)
+  #   - DPT-9.007: humidity (%)
+  #   - DPT-9.008: ppm (ppm)
+  #   - DPT-9.010: time_1 (s)
+  #   - DPT-9.011: time_2 (ms)
+  #   - DPT-9.020: voltage (mV)
+  #   - DPT-9.021: curr (mA)
+  #   - DPT-9.022: power_density (W/m²)
+  #   - DPT-9.023: kelvin_per_percent (K/%)
+  #   - DPT-9.024: power_2byte (kW)
+  #   - DPT-9.025: volume_flow (1/h)
+  #   - DPT-9.026: rain_amount (l/m²)
+  #   - DPT-9.027: temperature_f (°F)
+  #   - DPT-9.028: wind_speed_kmh (km/h)
+  #   - DPT-9.***: enthalpy (H)
   #  
   #   dpt_4byte_int
   #
-  #   - DPT-12.****: 4byte_unsigned
+  #   - DPT-12.***: 4byte_unsigned
   #   - DPT-12.1200: volume_liquid_litre (l)
   #   - DPT-12.1201: volume_m3 (m³)
-  #   - DPT-13.****: 4byte_signed
-  #   - DPT-13.0001: pulse_4byte (pulses)
-  #   - DPT-13.0002: flow_rate_m3h (m³/h)
-  #   - DPT-13.0010: active_energy (Wh)
-  #   - DPT-13.0011: apparant_energy (VAh)
-  #   - DPT-13.0012: reactive_energy (VARh)
-  #   - DPT-13.0013: active_energy_kwh (kWh)
-  #   - DPT-13.0014: apparant_energy_kvah (kVAh)
-  #   - DPT-13.0015: reactive_energy_kvarh (kVARh)
-  #   - DPT-13.0100: long_delta_timesec (s)
+  #   - DPT-13.***: 4byte_signed
+  #   - DPT-13.001: pulse_4byte (pulses)
+  #   - DPT-13.002: flow_rate_m3h (m³/h)
+  #   - DPT-13.010: active_energy (Wh)
+  #   - DPT-13.011: apparant_energy (VAh)
+  #   - DPT-13.012: reactive_energy (VARh)
+  #   - DPT-13.013: active_energy_kwh (kWh)
+  #   - DPT-13.014: apparant_energy_kvah (kVAh)
+  #   - DPT-13.015: reactive_energy_kvarh (kVARh)
+  #   - DPT-13.100: long_delta_timesec (s)
   #
   #   dpt_4byte_float
   #
-  #   - DPT-14.****: 4byte_float
-  #   - DPT-14.0000: acceleration (m/s²)
-  #   - DPT-14.0001: acceleration_angular (rad/s²)
-  #   - DPT-14.0002: activation_energy (J/mol)
-  #   - DPT-14.0003: activity (s⁻¹)
-  #   - DPT-14.0004: mol (mol)
-  #   - DPT-14.0005: amplitude
-  #   - DPT-14.0006: angle_rad (rad)
-  #   - DPT-14.0007: angle_deg (°)
-  #   - DPT-14.0008: angular_momentum (J s)
-  #   - DPT-14.0009: angular_velocity (rad/s)
-  #   - DPT-14.0010: area (m²)
-  #   - DPT-14.0011: capacitance (F)
-  #   - DPT-14.0012: charge_density_surface (C/m²)
-  #   - DPT-14.0013: charge_density_volume (C/m³)
-  #   - DPT-14.0014: compressibility (m²/N)
-  #   - DPT-14.0015: conductance (S)
-  #   - DPT-14.0016: electrical_conductivity (S/m)
-  #   - DPT-14.0017: density (kg/m³)
-  #   - DPT-14.0018: electric_charge (C)
-  #   - DPT-14.0019: electric_current (A)
-  #   - DPT-14.0020: electric_current_density (A/m²)
-  #   - DPT-14.0021: electric_dipole_moment (C m)
-  #   - DPT-14.0022: electric_displacement (C/m²)
-  #   - DPT-14.0023: electric_field_strength (V/m)
-  #   - DPT-14.0024: electric_flux (c)
-  #   - DPT-14.0025: electric_flux_density (C/m²)
-  #   - DPT-14.0026: electric_polarization (C/m²)
-  #   - DPT-14.0027: electric_potential (V)
-  #   - DPT-14.0028: electric_potential_difference (V)
-  #   - DPT-14.0029: electromagnetic_moment (A m²)
-  #   - DPT-14.0030: electromotive_force (V)
-  #   - DPT-14.0031: energy (J)
-  #   - DPT-14.0032: force (N)
-  #   - DPT-14.0033: frequency (Hz)
-  #   - DPT-14.0034: angular_frequency (rad/s)
-  #   - DPT-14.0035: heatcapacity (J/K)
-  #   - DPT-14.0036: heatflowrate (W)
-  #   - DPT-14.0037: heat_quantity (J)
-  #   - DPT-14.0038: impedance (Ω)
-  #   - DPT-14.0039: length (m)
-  #   - DPT-14.0040: light_quantity (lm s)
-  #   - DPT-14.0041: luminance (cd/m²)
-  #   - DPT-14.0042: luminous_flux (lm)
-  #   - DPT-14.0043: luminous_intensity (cd)
-  #   - DPT-14.0044: magnetic_field_strength (A/m)
-  #   - DPT-14.0045: magnetic_flux (Wb)
-  #   - DPT-14.0046: magnetic_flux_density (T)
-  #   - DPT-14.0047: magnetic_moment (A m²)
-  #   - DPT-14.0048: magnetic_polarization (T)
-  #   - DPT-14.0049: magnetization (A/m)
-  #   - DPT-14.0050: magnetomotive_force (A)
-  #   - DPT-14.0051: mass (kg)
-  #   - DPT-14.0052: mass_flux (kg/s)
-  #   - DPT-14.0053: momentum (N/s)
-  #   - DPT-14.0054: phaseanglerad (rad)
-  #   - DPT-14.0055: phaseangledeg (°)
-  #   - DPT-14.0056: power (W)
-  #   - DPT-14.0057: powerfactor (cosΦ)
-  #   - DPT-14.0058: pressure (Pa)
-  #   - DPT-14.0059: reactance (Ω)
-  #   - DPT-14.0060: resistance (Ω)
-  #   - DPT-14.0061: resistivity (Ω m)
-  #   - DPT-14.0062: self_inductance (H)
-  #   - DPT-14.0063: solid_angle (sr)
-  #   - DPT-14.0064: sound_intensity (W/m²)
-  #   - DPT-14.0065: speed (m/s)
-  #   - DPT-14.0066: stress (Pa)
-  #   - DPT-14.0067: surface_tension (N/m)
-  #   - DPT-14.0068: common_temperature (°C)
-  #   - DPT-14.0069: absolute_temperature (K)
-  #   - DPT-14.0070: temperature_difference (K)
-  #   - DPT-14.0071: thermal_capacity (J/K)
-  #   - DPT-14.0072: thermal_conductivity (W/mK)
-  #   - DPT-14.0073: thermoelectric_power (V/K)
-  #   - DPT-14.0074: time_seconds (s)
-  #   - DPT-14.0075: torque (N m)
-  #   - DPT-14.0076: volume (m³)
-  #   - DPT-14.0077: volume_flux (m³/s)
-  #   - DPT-14.0078: weight (N)
-  #   - DPT-14.0079: work (J)
+  #   - DPT-14.***: 4byte_float
+  #   - DPT-14.000: acceleration (m/s²)
+  #   - DPT-14.001: acceleration_angular (rad/s²)
+  #   - DPT-14.002: activation_energy (J/mol)
+  #   - DPT-14.003: activity (s⁻¹)
+  #   - DPT-14.004: mol (mol)
+  #   - DPT-14.005: amplitude
+  #   - DPT-14.006: angle_rad (rad)
+  #   - DPT-14.007: angle_deg (°)
+  #   - DPT-14.008: angular_momentum (J s)
+  #   - DPT-14.009: angular_velocity (rad/s)
+  #   - DPT-14.010: area (m²)
+  #   - DPT-14.011: capacitance (F)
+  #   - DPT-14.012: charge_density_surface (C/m²)
+  #   - DPT-14.013: charge_density_volume (C/m³)
+  #   - DPT-14.014: compressibility (m²/N)
+  #   - DPT-14.015: conductance (S)
+  #   - DPT-14.016: electrical_conductivity (S/m)
+  #   - DPT-14.017: density (kg/m³)
+  #   - DPT-14.018: electric_charge (C)
+  #   - DPT-14.019: electric_current (A)
+  #   - DPT-14.020: electric_current_density (A/m²)
+  #   - DPT-14.021: electric_dipole_moment (C m)
+  #   - DPT-14.022: electric_displacement (C/m²)
+  #   - DPT-14.023: electric_field_strength (V/m)
+  #   - DPT-14.024: electric_flux (c)
+  #   - DPT-14.025: electric_flux_density (C/m²)
+  #   - DPT-14.026: electric_polarization (C/m²)
+  #   - DPT-14.027: electric_potential (V)
+  #   - DPT-14.028: electric_potential_difference (V)
+  #   - DPT-14.029: electromagnetic_moment (A m²)
+  #   - DPT-14.030: electromotive_force (V)
+  #   - DPT-14.031: energy (J)
+  #   - DPT-14.032: force (N)
+  #   - DPT-14.033: frequency (Hz)
+  #   - DPT-14.034: angular_frequency (rad/s)
+  #   - DPT-14.035: heatcapacity (J/K)
+  #   - DPT-14.036: heatflowrate (W)
+  #   - DPT-14.037: heat_quantity (J)
+  #   - DPT-14.038: impedance (Ω)
+  #   - DPT-14.039: length (m)
+  #   - DPT-14.040: light_quantity (lm s)
+  #   - DPT-14.041: luminance (cd/m²)
+  #   - DPT-14.042: luminous_flux (lm)
+  #   - DPT-14.043: luminous_intensity (cd)
+  #   - DPT-14.044: magnetic_field_strength (A/m)
+  #   - DPT-14.045: magnetic_flux (Wb)
+  #   - DPT-14.046: magnetic_flux_density (T)
+  #   - DPT-14.047: magnetic_moment (A m²)
+  #   - DPT-14.048: magnetic_polarization (T)
+  #   - DPT-14.049: magnetization (A/m)
+  #   - DPT-14.050: magnetomotive_force (A)
+  #   - DPT-14.051: mass (kg)
+  #   - DPT-14.052: mass_flux (kg/s)
+  #   - DPT-14.053: momentum (N/s)
+  #   - DPT-14.054: phaseanglerad (rad)
+  #   - DPT-14.055: phaseangledeg (°)
+  #   - DPT-14.056: power (W)
+  #   - DPT-14.057: powerfactor (cosΦ)
+  #   - DPT-14.058: pressure (Pa)
+  #   - DPT-14.059: reactance (Ω)
+  #   - DPT-14.060: resistance (Ω)
+  #   - DPT-14.061: resistivity (Ω m)
+  #   - DPT-14.062: self_inductance (H)
+  #   - DPT-14.063: solid_angle (sr)
+  #   - DPT-14.064: sound_intensity (W/m²)
+  #   - DPT-14.065: speed (m/s)
+  #   - DPT-14.066: stress (Pa)
+  #   - DPT-14.067: surface_tension (N/m)
+  #   - DPT-14.068: common_temperature (°C)
+  #   - DPT-14.069: absolute_temperature (K)
+  #   - DPT-14.070: temperature_difference (K)
+  #   - DPT-14.071: thermal_capacity (J/K)
+  #   - DPT-14.072: thermal_conductivity (W/mK)
+  #   - DPT-14.073: thermoelectric_power (V/K)
+  #   - DPT-14.074: time_seconds (s)
+  #   - DPT-14.075: torque (N m)
+  #   - DPT-14.076: volume (m³)
+  #   - DPT-14.077: volume_flux (m³/s)
+  #   - DPT-14.078: weight (N)
+  #   - DPT-14.079: work (J)
 
   # Data point definition:
   # ----------------------
+  #
   # 'Parameter Name':
   #   value_type: '?'
   #   group_address: '?/?/?'
@@ -224,173 +225,376 @@ data_points:
   # https://htheatpump.readthedocs.io/en/latest/htparams.html
   #
   'Liegenschaft':
+    # MIN: 0
+    # MAX: 2147483647
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/1'
   # -----------------------------------------------------------------
   'WP_System':
+    # MIN: 1
+    # MAX: 2
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/2'
   # -----------------------------------------------------------------
   'WW Type':
+    # MIN: 0
+    # MAX: 4
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/3'
   # -----------------------------------------------------------------
   'FWS Type':
+    # MIN: 0
+    # MAX: 1
     value_type: 'binary'  # DPT-1
     group_address: '1/7/4'
   # -----------------------------------------------------------------
   'Puffer Type':
+    # MIN: 0
+    # MAX: 1
     value_type: 'binary'  # DPT-1
     group_address: '1/7/5'
   # -----------------------------------------------------------------
   'Verdichter_Status':
+    # MIN: 0
+    # MAX: 11
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/6'
   # -----------------------------------------------------------------
   'Verdichter laeuft seit':
+    # MIN: 10
+    # MAX: 100000
     value_type: 'long_delta_timesec'  # DPT-13.100
     group_address: '1/7/7'
   # -----------------------------------------------------------------
   'Verdichter Einschaltverz.(sec)':
+    # MIN: 0
+    # MAX: 10800
     value_type: 'time_period_sec'  # DPT-7.005
     group_address: '1/7/8'
   # -----------------------------------------------------------------
   'Betriebsart':
+    # MIN: 0
+    # MAX: 7
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/9'
   # -----------------------------------------------------------------
   'HKR Soll_Raum':
+    # MIN: 10.0
+    # MAX: 25.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/10'
   # -----------------------------------------------------------------
   'HKR Aufheiztemp. (K)':
+    # MIN: 1
+    # MAX: 10
     value_type: 'temperature_difference'  # DPT-14.070
     group_address: '1/7/11'
   # -----------------------------------------------------------------
   'HKR Absenktemp. (K)':
+    # MIN: -10
+    # MAX: -1
     value_type: 'temperature_difference'  # DPT-14.070
     group_address: '1/7/12'
   # -----------------------------------------------------------------
   'HKR Heizgrenze':
+    # MIN: 0
+    # MAX: 45
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/13'
   # -----------------------------------------------------------------
   'HKR RLT Soll_oHG (Heizkurve)':
+    # MIN: 15.0
+    # MAX: 40.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/14'
   # -----------------------------------------------------------------
   'HKR RLT Soll_0 (Heizkurve)':
+    # MIN: 20.0
+    # MAX: 50.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/15'
   # -----------------------------------------------------------------
   'HKR RLT Soll_uHG (Heizkurve)':
+    # MIN: 25.0
+    # MAX: 60.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/16'
   # -----------------------------------------------------------------
   'WW Normaltemp.':
+    # MIN: 10
+    # MAX: 75
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/17'
   # -----------------------------------------------------------------
   'WW Hysterese Normaltemp.':
+    # MIN: 1
+    # MAX: 10
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/18'
   # -----------------------------------------------------------------
   'WW Minimaltemp.':
+    # MIN: 5
+    # MAX: 45
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/19'
   # -----------------------------------------------------------------
   'WW Hysterese Minimaltemp.':
+    # MIN: 1
+    # MAX: 10
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/20'
   # -----------------------------------------------------------------
   'BSZ HKP Betriebsstunden':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/21'
   # -----------------------------------------------------------------
   'BSZ HKP Schaltung':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/22'
   # -----------------------------------------------------------------
   'BSZ EQ Betriebsstunden':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/23'
   # -----------------------------------------------------------------
   'BSZ EQ Schaltungen':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/24'
   # -----------------------------------------------------------------
   'BSZ WWV Betriebsstunden':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/25'
   # -----------------------------------------------------------------
   'BSZ WWV Schaltungen':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/26'
   # -----------------------------------------------------------------
   'BSZ ZIPWW Betriebsstunden':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/27'
   # -----------------------------------------------------------------
   'BSZ ZIPWW Schaltungen':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/28'
   # -----------------------------------------------------------------
   'BSZ Verdichter Betriebsst. WW':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/29'
   # -----------------------------------------------------------------
   'BSZ Verdichter Betriebsst. HKR':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/30'
   # -----------------------------------------------------------------
   'BSZ Verdichter Betriebsst. ges':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/31'
   # -----------------------------------------------------------------
   'BSZ Verdichter akt. Laufzeit':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/32'
   # -----------------------------------------------------------------
   'MKR2 Aktiviert':
+    # MIN: 0
+    # MAX: 2
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/33'
   # -----------------------------------------------------------------
   'Energiezaehler':
+    # MIN: 0
+    # MAX: 2
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/34'
   # -----------------------------------------------------------------
   'BSZ Verdichter Schaltung WW':
+    # MIN: 0
+    # MAX: 100000
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/35'
-      
-
-#      Temp. Aussen     MP,NR=0     r-     FLOAT     -20.0     40.0
-#      Temp. Aussen verzoegert     MP,NR=1     r-     FLOAT     -20.0     40.0
-#      Temp. Brauchwasser     MP,NR=2     r-     FLOAT     0.0     70.0
-#      Temp. Vorlauf     MP,NR=3     r-     FLOAT     0.0     70.0
-#      Temp. Ruecklauf     MP,NR=4     r-     FLOAT     0.0     70.0
-#      Temp. Pufferspeicher     MP,NR=5     r-     FLOAT     0.0     70.0
-#      Temp. EQ_Eintritt     MP,NR=6     r-     FLOAT     -20.0     30.0
-#      Temp. EQ_Austritt     MP,NR=7     r-     FLOAT     -20.0     30.0
-#      Temp. Sauggas     MP,NR=9     r-     FLOAT     -20.0     30.0
-#      Temp. Frischwasser_Istwert     MP,NR=11     r-     FLOAT     0.0     70.0
-#      Temp. Verdampfung     MP,NR=12     r-     FLOAT     -50.0     30.0
-#      Temp. Kondensation     MP,NR=13     r-     FLOAT     -50.0     60.0
-#      Temp. Heissgas     MP,NR=15     r-     FLOAT     0.0     150.0
-#      Niederdruck (bar)     MP,NR=20     r-     FLOAT     0.0     18.0
-#      Hochdruck (bar)     MP,NR=21     r-     FLOAT     0.0     40.0
-#      Heizkreispumpe     MP,NR=22     r-     BOOL     False     True
-#      EQ Pumpe (Ventilator)     MP,NR=24     r-     BOOL     False     True
-#      Warmwasservorrang     MP,NR=25     r-     BOOL     False     True
-#      Zirkulationspumpe WW     MP,NR=29     r-     BOOL     False     True
-#      Verdichter     MP,NR=30     r-     BOOL     False     True
-#      Stoerung     MP,NR=31     r-     BOOL     False     True
-#      Hauptschalter     MP,NR=36     r-     BOOL     False     True
-#      FWS Stroemungsschalter     MP,NR=38     r-     BOOL     False     True
-#      BSZ Verdichter Schaltungen     MP, NR=41     r-     INT     0     100000
-#      Frischwasserpumpe     MP,NR=50     r-     INT     0     100
-#      Verdichteranforderung     MP,NR=56     r-     INT     0     5
-#      HKR_Sollwert     MP,NR=57     r-     FLOAT     0.0     50.0
+  # -----------------------------------------------------------------
+  'Temp. Aussen':
+    # MIN: -20.0
+    # MAX: 40.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/36'
+  # -----------------------------------------------------------------
+  'Temp. Aussen verzoegert':
+    # MIN: -20.0
+    # MAX: 40.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/37'
+  # -----------------------------------------------------------------
+  'Temp. Brauchwasser':
+    # MIN: 0.0
+    # MAX: 70.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/38'
+  # -----------------------------------------------------------------
+  'Temp. Vorlauf':
+    # MIN: 0.0
+    # MAX: 70.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/39'
+  # -----------------------------------------------------------------
+  'Temp. Ruecklauf':
+    # MIN: 0.0
+    # MAX: 70.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/40'
+  # -----------------------------------------------------------------
+  'Temp. Pufferspeicher':
+    # MIN: 0.0
+    # MAX: 70.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/41'
+  # -----------------------------------------------------------------
+  'Temp. EQ_Eintritt':
+    # MIN: -20.0
+    # MAX: 30.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/42'
+  # -----------------------------------------------------------------
+  'Temp. EQ_Austritt':
+    # MIN: -20.0
+    # MAX: 30.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/43'
+  # -----------------------------------------------------------------
+  'Temp. Sauggas':
+    # MIN: -20.0
+    # MAX: 30.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/44'
+  # -----------------------------------------------------------------
+  'Temp. Frischwasser_Istwert':
+    # MIN: 0.0
+    # MAX: 70.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/45'
+  # -----------------------------------------------------------------
+  'Temp. Verdampfung':
+    # MIN: -50.0
+    # MAX: 30.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/46'
+  # -----------------------------------------------------------------
+  'Temp. Kondensation':
+    # MIN: -50.0
+    # MAX: 60.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/47'
+  # -----------------------------------------------------------------
+  'Temp. Heissgas':
+    # MIN: 0.0
+    # MAX: 150.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/48'
+  # -----------------------------------------------------------------
+  'Niederdruck (bar)':
+    # MIN: 0.0
+    # MAX: 18.0
+    value_type: '4byte_float'  # DPT-14
+    group_address: '1/7/49'
+  # -----------------------------------------------------------------
+  'Hochdruck (bar)':
+    # MIN: 0.0
+    # MAX: 40.0
+    value_type: '4byte_float'  # DPT-14
+    group_address: '1/7/50'
+  # -----------------------------------------------------------------
+  'Heizkreispumpe':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/51'
+  # -----------------------------------------------------------------
+  'EQ Pumpe (Ventilator)':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/52'
+  # -----------------------------------------------------------------
+  'Warmwasservorrang':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/53'
+  # -----------------------------------------------------------------
+  'Zirkulationspumpe WW':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/54'
+  # -----------------------------------------------------------------
+  'Verdichter':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/55'
+  # -----------------------------------------------------------------
+  'Stoerung':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/56'
+  # -----------------------------------------------------------------
+  'Hauptschalter':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/57'
+  # -----------------------------------------------------------------
+  'FWS Stroemungsschalter':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/58'
+  # -----------------------------------------------------------------
+  'BSZ Verdichter Schaltungen':
+    # MIN: 0
+    # MAX: 100000
+    value_type: '4byte_unsigned'  # DPT-12
+    group_address: '1/7/59'
+  # -----------------------------------------------------------------
+  'Frischwasserpumpe':
+    # MIN: 0
+    # MAX: 100
+    value_type: 'percentU8'  # DPT-5.004
+    group_address: '1/7/60'
+  # -----------------------------------------------------------------
+  'Verdichteranforderung':
+    # MIN: 0
+    # MAX: 5
+    value_type: '1byte_unsigned'  # DPT-5
+    group_address: '1/7/61'
+  # -----------------------------------------------------------------
+  'HKR_Sollwert':
+    # MIN: 0.0
+    # MAX: 50.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/62'
 
 
 notifications:
