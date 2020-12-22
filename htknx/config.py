@@ -169,6 +169,19 @@ DATA_POINT_SCHEMA = vol.All(
 )
 
 
+def check_for_valid_parameter_names() -> Callable:
+    """ Check for valid parameter names in the data points section. """
+
+    def validate(obj: Dict) -> Dict:
+        for name in obj.keys():
+            if name not in HtParams.keys():
+                raise vol.Invalid(f"'{name}' is not a valid heat pump parameter")
+
+        return obj
+
+    return validate
+
+
 def check_for_warnings_in_data_points() -> Callable:
     """ Check for warnings in the data point config section. """
 
@@ -198,7 +211,8 @@ def check_for_warnings_in_data_points() -> Callable:
 
 DATA_POINTS_SCHEMA = vol.All(
     dict,
-    vol.Schema({vol.All(cv.string, vol.In(HtParams.keys())): DATA_POINT_SCHEMA}),
+    vol.Schema({cv.string: DATA_POINT_SCHEMA}),
+    check_for_valid_parameter_names(),
     check_for_warnings_in_data_points(),
 )
 
