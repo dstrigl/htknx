@@ -208,7 +208,7 @@ NOTIFICATION_SCHEMA = vol.Schema(
 
 ON_MALFUNCTION_SCHEMA = NOTIFICATION_SCHEMA.extend(
     {
-        vol.Optional(CONF_REPEAT_AFTER, default=None): vol.Any(cv.time_interval, None),
+        vol.Optional(CONF_REPEAT_AFTER, default=None): vol.Or(cv.time_interval, None),
     }
 )
 
