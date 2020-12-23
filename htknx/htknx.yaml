@@ -283,6 +283,7 @@ data_points:
     # MAX: 25.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/10'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'HKR Aufheiztemp. (K)':
     # MIN: 1
@@ -439,6 +440,7 @@ data_points:
     # MAX: 40.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/36'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. Aussen verzoegert':
     # MIN: -20.0
@@ -451,18 +453,21 @@ data_points:
     # MAX: 70.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/38'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. Vorlauf':
     # MIN: 0.0
     # MAX: 70.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/39'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. Ruecklauf':
     # MIN: 0.0
     # MAX: 70.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/40'
+    cyclic_sending: true
   # -----------------------------------------------------------------
 # TODO
 #  'Temp. Pufferspeicher':
@@ -476,12 +481,14 @@ data_points:
     # MAX: 30.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/42'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. EQ_Austritt':
     # MIN: -20.0
     # MAX: 30.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/43'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. Sauggas':
     # MIN: -20.0
@@ -494,6 +501,7 @@ data_points:
     # MAX: 70.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/45'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. Verdampfung':
     # MIN: -50.0
@@ -530,6 +538,7 @@ data_points:
     # MAX: 1
     value_type: 'binary'  # DPT-1
     group_address: '1/7/51'
+    send_on_change: true
   # -----------------------------------------------------------------
   'EQ Pumpe (Ventilator)':
     # MIN: 0
@@ -542,6 +551,7 @@ data_points:
     # MAX: 1
     value_type: 'binary'  # DPT-1
     group_address: '1/7/53'
+    send_on_change: true
   # -----------------------------------------------------------------
   'Zirkulationspumpe WW':
     # MIN: 0
@@ -584,6 +594,7 @@ data_points:
     # MAX: 100
     value_type: 'percentU8'  # DPT-5.004
     group_address: '1/7/60'
+    send_on_change: true
   # -----------------------------------------------------------------
   'Verdichteranforderung':
     # MIN: 0
