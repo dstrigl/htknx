@@ -313,9 +313,8 @@ async def main_async():
         _LOGGER.error("Failed to start Heliotherm heat pump KNX gateway: %s", ex)
         sys.exit(1)
     finally:
-        if hthp is not None:
-            await hthp.logout_async()  # try to logout for an ordinary cancellation (if possible)
-            hthp.close_connection()
+        await hthp.logout_async()  # try to logout for an ordinary cancellation (if possible)
+        hthp.close_connection()
 
     sys.exit(0)
 
