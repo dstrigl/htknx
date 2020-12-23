@@ -595,6 +595,7 @@ data_points:
     value_type: 'percentU8'  # DPT-5.004
     group_address: '1/7/60'
     send_on_change: true
+    on_change_of_absolute: 1
   # -----------------------------------------------------------------
   'Verdichteranforderung':
     # MIN: 0
