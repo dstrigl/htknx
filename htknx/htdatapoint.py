@@ -125,6 +125,8 @@ class HtDataPoint(Device):
         """Broadcast parameter value to KNX bus."""
         if response or self.cyclic_sending:
             value = self.param_value.value
+            if value is None:
+                return
             _LOGGER.debug(
                 "Broadcast DP '%s' [%s]: value=%s (response: %s, cyclic_sending: %s)",
                 self.name,
@@ -133,8 +135,6 @@ class HtDataPoint(Device):
                 response,
                 self.cyclic_sending,
             )
-            if value is None:
-                return
             await self.param_value.set(value, response=response)
             # if response:  # TODO necessary?
             #     self.last_sent_value = value
