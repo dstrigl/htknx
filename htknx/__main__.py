@@ -229,40 +229,67 @@ async def main_async():
     args = parser.parse_args()
     print(args)
 
-    # load logging config from file
-    logging.config.fileConfig(args.logging_config, disable_existing_loggers=False)
-
-    _LOGGER.info("Start Heliotherm heat pump KNX gateway v%s.", __version__)
-
-    # load the settings from the config file
-    config = Config()
-    _LOGGER.info("Load settings from '%s'.", args.config_file)
-    config.read(args.config_file)
-    _LOGGER.debug("Config: %s", config.__dict__)
-
-    # create objects to establish connection to the heat pump and the KNX bus
-    hthp = HtHeatpump(**config.heat_pump)
-    xknx = XKNX(**config.knx)
-
-    # create data points
-    data_points: Dict[str, HtDataPoint] = {}
-    for dp_name, dp_conf in config.data_points.items():
-        data_points[dp_name] = HtDataPoint.from_config(xknx, hthp, dp_name, dp_conf)
-        _LOGGER.debug("DP: %s", data_points[dp_name])
-
-    # create notifications
-    notifications: Dict[str, Type[Notification]] = {}
-    for notif_name, notif_conf in config.notifications.items():
-        if notif_name == "on_malfunction":
-            notifications[notif_name] = HtFaultNotification.from_config(
-                xknx, hthp, notif_name, notif_conf
-            )
-            _LOGGER.debug("NOTIF: %s", notifications[notif_name])
-        else:
-            _LOGGER.warning("Invalid notification '%s'", notif_name)
-            # assert 0, "Invalid notification"
+    try:
+        # load logging config from file
+        logging.config.fileConfig(args.logging_config, disable_existing_loggers=False)
+    except Exception as ex:
+        _LOGGER.error(
+            "Failed to read logging config file '%s': %s", args.config_file, ex
+        )
+        sys.exit(1)
 
     try:
+        # load the settings from the config file
+        config = Config()
+        _LOGGER.info("Load settings from '%s'.", args.config_file)
+        config.read(args.config_file)
+        _LOGGER.debug("Config: %s", config.__dict__)
+    except Exception as ex:
+        _LOGGER.error(
+            "Failed to read gateway config file '%s': %s", args.config_file, ex
+        )
+        sys.exit(1)
+
+    _LOGGER.info("Start Heliotherm heat pump KNX gateway v%s.", __version__)
+    try:
+        # create objects to establish connection to the heat pump and the KNX bus
+        hthp = HtHeatpump(**config.heat_pump)
+        xknx = XKNX(**config.knx)
+
+        group_addresses: Dict[str, str] = {}
+
+        # create data points
+        data_points: Dict[str, HtDataPoint] = {}
+        for dp_name, dp_conf in config.data_points.items():
+            data_points[dp_name] = HtDataPoint.from_config(xknx, hthp, dp_name, dp_conf)
+            _LOGGER.debug("DP: %s", data_points[dp_name])
+            ga = str(data_points[dp_name].group_address)
+            if ga in group_addresses:
+                raise RuntimeError(
+                    "Multiple use of the same KNX group address"
+                    f" '{ga}' ('{group_addresses[ga]}' and '{dp_name}')"
+                )
+            group_addresses[ga] = dp_name
+
+        # create notifications
+        notifications: Dict[str, Type[Notification]] = {}
+        for notif_name, notif_conf in config.notifications.items():
+            if notif_name == "on_malfunction":
+                notifications[notif_name] = HtFaultNotification.from_config(
+                    xknx, hthp, notif_name, notif_conf
+                )
+                _LOGGER.debug("NOTIF: %s", notifications[notif_name])
+            else:
+                _LOGGER.warning("Invalid notification '%s'", notif_name)
+                # assert 0, "Invalid notification"
+            ga = str(notifications[notif_name].group_address)
+            if ga in group_addresses:
+                raise RuntimeError(
+                    "Multiple use of the same KNX group address"
+                    f" '{ga}' ('{group_addresses[ga]}' and '{notif_name}')"
+                )
+            group_addresses[ga] = notif_name
+
         # open the connection to the Heliotherm heat pump and login
         hthp.open_connection()
         await hthp.login_async()
@@ -283,11 +310,12 @@ async def main_async():
         await xknx.stop()
 
     except Exception as ex:
-        _LOGGER.exception(ex)
+        _LOGGER.error("Failed to start Heliotherm heat pump KNX gateway: %s", ex)
         sys.exit(1)
     finally:
-        await hthp.logout_async()  # try to logout for an ordinary cancellation (if possible)
-        hthp.close_connection()
+        if hthp is not None:
+            await hthp.logout_async()  # try to logout for an ordinary cancellation (if possible)
+            hthp.close_connection()
 
     sys.exit(0)
 

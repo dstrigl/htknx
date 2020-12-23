@@ -269,18 +269,14 @@ class Config:
         :type filename: str
         """
         # _LOGGER.debug("Reading config file '%s'.", filename)
-        try:
-            with open(filename, "r") as f:
-                doc = yaml.safe_load(f)
-                doc = CONFIG_SCHEMA(doc)
-                self._parse_general_settings(doc)
-                self._parse_heat_pump_settings(doc)
-                self._parse_knx_settings(doc)
-                self._parse_data_points(doc)
-                self._parse_notifications(doc)
-        except Exception as e:
-            _LOGGER.error("Failed to read config file '{%s}': %s", filename, e)
-            raise
+        with open(filename, "r") as f:
+            doc = yaml.safe_load(f)
+            doc = CONFIG_SCHEMA(doc)
+            self._parse_general_settings(doc)
+            self._parse_heat_pump_settings(doc)
+            self._parse_knx_settings(doc)
+            self._parse_data_points(doc)
+            self._parse_notifications(doc)
 
     def _parse_general_settings(self, doc) -> None:
         """Parse the general section of the config file."""

@@ -25,7 +25,7 @@ from xknx import XKNX
 from xknx.devices import Device
 from xknx.remote_value.remote_value_sensor import RemoteValueSensor
 from xknx.remote_value.remote_value_switch import RemoteValueSwitch
-from xknx.telegram import TelegramDirection
+from xknx.telegram import TelegramDirection, GroupAddress
 from htheatpump import HtHeatpump, HtParams, HtDataTypes
 from typing import Union
 
@@ -116,6 +116,10 @@ class HtDataPoint(Device):
             on_change_of_relative=on_change_of_relative,
             device_updated_cb=device_updated_cb,
         )
+
+    @property
+    def group_address(self) -> GroupAddress:
+        return self.param_value.group_address
 
     async def broadcast_value(self, response=False):
         """Broadcast parameter value to KNX bus."""
@@ -283,7 +287,7 @@ class HtDataPoint(Device):
             ' on_change_of_absolute="{}" on_change_of_relative="{}" last_sent_value="{}"/>'
         ).format(
             self.name,
-            self.param_value.group_address,
+            self.group_address,
             "binary"
             if isinstance(self.param_value, RemoteValueSwitch)
             else self.param_value.dpt_class.value_type,

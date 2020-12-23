@@ -23,6 +23,7 @@ import logging
 
 from xknx import XKNX
 from xknx.devices import Notification
+from xknx.telegram import GroupAddress
 from htheatpump import HtHeatpump
 from datetime import timedelta, datetime
 from typing import Optional
@@ -60,6 +61,10 @@ class HtFaultNotification(Notification):
             xknx, hthp, name, group_address=group_address, repeat_after=repeat_after
         )
 
+    @property
+    def group_address(self) -> GroupAddress:
+        return self._message.group_address
+
     async def do(self):
         """Execute the 'do' command."""
         try:
@@ -94,7 +99,7 @@ class HtFaultNotification(Notification):
             ' repeat_after="{}" last_sent_at="{}" in_error="{}"/>'
         ).format(
             self.name,
-            self._message.group_address,
+            self.group_address,
             self.repeat_after,
             self.last_sent_at,
             self.in_error,
