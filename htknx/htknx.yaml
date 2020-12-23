@@ -14,13 +14,13 @@ heat_pump:
 
 knx:
   gateway_ip: '192.168.11.81'
-#   gateway_port: 3671
-#   auto_reconnect: True
-#   auto_reconnect_wait:
-#     seconds: 3
-#   local_ip: '192.168.11.140'
-#   own_address: '15.15.250'
-#   rate_limit: 20
+  rate_limit: 10
+#  gateway_port: 3671
+#  auto_reconnect: True
+#  auto_reconnect_wait:
+#    seconds: 3
+#  local_ip: '192.168.11.140'
+#  own_address: '15.15.250'
 
 data_points:
   #
