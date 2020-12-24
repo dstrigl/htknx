@@ -277,6 +277,8 @@ data_points:
     # MAX: 7
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/9'
+    send_on_change: true
+    on_change_of_absolute: 1
   # -----------------------------------------------------------------
   'HKR Soll_Raum':
     # MIN: 10.0
