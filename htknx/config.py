@@ -20,18 +20,17 @@
 """ Parsing a given config file in YAML format. """
 
 import logging
+from datetime import timedelta
+from typing import Any, Callable, Dict
+
 import voluptuous as vol
 import yaml
-
+from htheatpump.htparams import HtParams
 from xknx import XKNX
 from xknx.io import ConnectionConfig, ConnectionType
 from xknx.telegram import PhysicalAddress
-from htheatpump.htparams import HtParams
-from datetime import timedelta
-from typing import Dict, Any, Callable
 
 from . import config_validation as cv
-
 
 _LOGGER = logging.getLogger(__name__)
 

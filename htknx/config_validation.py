@@ -22,10 +22,10 @@
 from datetime import timedelta
 from numbers import Number
 from re import compile as re_compile
-from xknx.dpt import DPTBase
 from typing import Any, Callable, Dict, List, TypeVar, Union
 
 import voluptuous as vol
+from xknx.dpt import DPTBase
 
 # typing typevar
 T = TypeVar("T")

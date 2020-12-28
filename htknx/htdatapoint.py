@@ -20,15 +20,14 @@
 """ Representation of a Heliotherm heat pump parameter as a data point. """
 
 import logging
+from typing import Union
 
+from htheatpump import AioHtHeatpump, HtDataTypes, HtParams
 from xknx import XKNX
 from xknx.devices import Device
 from xknx.remote_value.remote_value_sensor import RemoteValueSensor
 from xknx.remote_value.remote_value_switch import RemoteValueSwitch
-from xknx.telegram import TelegramDirection, GroupAddress
-from htheatpump import HtHeatpump, HtParams, HtDataTypes
-from typing import Union
-
+from xknx.telegram import GroupAddress, TelegramDirection
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +38,7 @@ class HtDataPoint(Device):
     def __init__(
         self,
         xknx: XKNX,
-        hthp: HtHeatpump,
+        hthp: AioHtHeatpump,
         name: str,
         group_address,
         value_type: str,

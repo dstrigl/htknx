@@ -19,26 +19,25 @@
 
 """ Heliotherm heat pump KNX gateway main application. """
 
-import os
-import sys
+import argparse
 import asyncio
 import logging
 import logging.config
+import os
 import pprint
-import argparse
+import sys
 import textwrap
-
-from xknx import XKNX
-from xknx.devices import Notification
 from datetime import timedelta
-from htheatpump import HtHeatpump
 from typing import Dict, Optional, Type
 
+from htheatpump import AioHtHeatpump
+from xknx import XKNX
+from xknx.devices import Notification
+
+from .__version__ import __version__
 from .config import Config
 from .htdatapoint import HtDataPoint
 from .htfaultnotification import HtFaultNotification
-from .__version__ import __version__
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +50,7 @@ class HtPublisher:
 
     def __init__(
         self,
-        hthp: HtHeatpump,
+        hthp: AioHtHeatpump,
         data_points: Dict[str, HtDataPoint],
         notifications: Dict[str, Type[Notification]],
         update_interval: timedelta,
@@ -253,7 +252,7 @@ async def main_async():
     _LOGGER.info("Start Heliotherm heat pump KNX gateway v%s.", __version__)
     try:
         # create objects to establish connection to the heat pump and the KNX bus
-        hthp = HtHeatpump(**config.heat_pump)
+        hthp = AioHtHeatpump(**config.heat_pump)
         xknx = XKNX(**config.knx)
 
         group_addresses: Dict[str, str] = {}

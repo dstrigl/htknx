@@ -20,14 +20,13 @@
 """ Notification to inform about malfunctioning of the Heliotherm heat pump. """
 
 import logging
+from datetime import datetime, timedelta
+from typing import Optional
 
+from htheatpump import AioHtHeatpump
 from xknx import XKNX
 from xknx.devices import Notification
 from xknx.telegram import GroupAddress
-from htheatpump import HtHeatpump
-from datetime import timedelta, datetime
-from typing import Optional
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ class HtFaultNotification(Notification):
     def __init__(
         self,
         xknx: XKNX,
-        hthp: HtHeatpump,
+        hthp: AioHtHeatpump,
         name: str,
         group_address,
         repeat_after: Optional[timedelta],
