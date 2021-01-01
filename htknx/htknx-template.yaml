@@ -1,12 +1,12 @@
-# -----------------------------------------------------------
-#  Sample configuration for Heliotherm heat pump KNX gateway
-# -----------------------------------------------------------
+# -------------------------------------------------------------
+#  Configuration template for Heliotherm heat pump KNX gateway
+# -------------------------------------------------------------
 
 general:
   update_interval:
-    seconds: 25
+    seconds: 30
   cyclic_sending_interval:
-    minutes: 1
+    minutes: 5
 
 heat_pump:
   device: /dev/ttyUSB0

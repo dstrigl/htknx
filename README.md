@@ -81,8 +81,17 @@ DISCLAIMER
 ### Example
 
 ```
-TODO
+$ htknx /home/pi/my-htknx.yaml
+
+...
 ```
+
+
+### Configuration
+
+htknx is controlled via a configuration file. Per default the configuration file is named `htknx.yaml`.
+
+TODO
 
 
 ## Credits
