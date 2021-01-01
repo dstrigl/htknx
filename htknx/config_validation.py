@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #  htknx - Heliotherm heat pump KNX gateway
-#  Copyright (C) 2020  Daniel Strigl
+#  Copyright (C) 2021  Daniel Strigl
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ def time_period_seconds(value: Union[float, str]) -> timedelta:
     try:
         return timedelta(seconds=float(value))
     except (ValueError, TypeError) as err:
-        raise vol.Invalid(f"expected seconds, got {value}") from err
+        raise vol.Invalid(f"expected seconds, got {value!r}") from err
 
 
 time_period = vol.Any(time_period_str, time_period_seconds, timedelta, time_period_dict)
@@ -167,14 +167,14 @@ def boolean(value: Any) -> bool:
     elif isinstance(value, Number):
         # type ignore: https://github.com/python/mypy/issues/3186
         return value != 0  # type: ignore
-    raise vol.Invalid(f"invalid boolean value {value}")
+    raise vol.Invalid(f"invalid boolean value {value!r}")
 
 
 def number(value: Any) -> Union[int, float]:
     """ Validate numeric value. """
     if type(value) in (int, float):
         return value
-    raise vol.Invalid(f"invalid numeric value {value}")
+    raise vol.Invalid(f"invalid numeric value {value!r}")
 
 
 number_greater_zero = vol.All(number, vol.Range(min=0, min_included=False))
@@ -194,7 +194,7 @@ def ensure_group_address(value: str) -> str:
         return value
 
     if not KNX_GA_REGEX.match(value):
-        raise vol.Invalid(f"{value} is not a valid group address")
+        raise vol.Invalid(f"{value!r} is not a valid group address")
 
     return value
 
@@ -203,7 +203,7 @@ def ensure_physical_address(value: str) -> str:
     """ Ensure value is a valid physical address. """
     value = str(value)
     if not KNX_PA_REGEX.match(value):
-        raise vol.Invalid(f"{value} is not a valid physical address")
+        raise vol.Invalid(f"{value!r} is not a valid physical address")
 
     return value
 
@@ -212,6 +212,6 @@ def ensure_knx_dpt(value: str) -> str:
     """ Ensure value is a valid KNX DPT. """
     dpt_class = DPTBase.parse_transcoder(value)
     if dpt_class is None:
-        raise vol.Invalid(f"{value} is not a valid KNX DPT")
+        raise vol.Invalid(f"{value!r} is not a valid KNX DPT")
 
     return value

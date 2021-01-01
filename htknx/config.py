@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #  htknx - Heliotherm heat pump KNX gateway
-#  Copyright (C) 2020  Daniel Strigl
+#  Copyright (C) 2021  Daniel Strigl
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ def check_for_valid_parameter_names() -> Callable:
     def validate(obj: Dict) -> Dict:
         for name in obj.keys():
             if name not in HtParams.keys():
-                raise vol.Invalid(f"'{name}' is not a valid heat pump parameter")
+                raise vol.Invalid(f"{name!r} is not a valid heat pump parameter")
 
         return obj
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #  htknx - Heliotherm heat pump KNX gateway
-#  Copyright (C) 2020  Daniel Strigl
+#  Copyright (C) 2021  Daniel Strigl
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -266,7 +266,7 @@ async def main_async():
             if ga in group_addresses:
                 raise RuntimeError(
                     "Multiple use of the same KNX group address"
-                    f" '{ga}' ('{group_addresses[ga]}' and '{dp_name}')"
+                    f" {ga!r} ({group_addresses[ga]!r} and {dp_name!r})"
                 )
             group_addresses[ga] = dp_name
 
@@ -285,7 +285,7 @@ async def main_async():
             if ga in group_addresses:
                 raise RuntimeError(
                     "Multiple use of the same KNX group address"
-                    f" '{ga}' ('{group_addresses[ga]}' and '{notif_name}')"
+                    f" {ga!r} ({group_addresses[ga]!r} and {notif_name!r})"
                 )
             group_addresses[ga] = notif_name
 
