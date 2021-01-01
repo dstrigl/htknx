@@ -1,0 +1,17 @@
+[Unit]
+Description=Heliotherm heat pump KNX gateway
+After=network.target
+Requires=network.target
+
+[Service]
+Type=idle
+ExecStart=/home/pi/venv/htknx/bin/htknx /home/pi/htknx.yaml
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=30s
+User=pi
+
+[Install]
+WantedBy=multi-user.target
