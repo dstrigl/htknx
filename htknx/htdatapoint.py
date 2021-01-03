@@ -188,7 +188,7 @@ class HtDataPoint(Device):
         """Set new value and send it to the KNX bus if desired."""
 
         def numeric_value_changed(value) -> bool:
-            """ Determines whether a numeric value changed or not. """
+            """Determines whether a numeric value changed or not."""
             assert self.last_sent_value is not None
             if self.on_change_of_absolute is not None:
                 return abs(value - self.last_sent_value) >= abs(

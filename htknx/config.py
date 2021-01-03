@@ -28,7 +28,7 @@ import yaml
 from htheatpump.htparams import HtParams
 from xknx import XKNX
 from xknx.io import ConnectionConfig, ConnectionType
-from xknx.telegram import PhysicalAddress
+from xknx.telegram import IndividualAddress
 
 from . import config_validation as cv
 
@@ -104,7 +104,7 @@ KNX_SCHEMA = vol.Schema(
         vol.Optional(CONF_LOCAL_IP): cv.string,
         vol.Optional(
             CONF_OWN_ADDRESS, default=XKNX.DEFAULT_ADDRESS
-        ): cv.ensure_physical_address,
+        ): cv.ensure_individual_address,
         vol.Optional(CONF_RATE_LIMIT, default=XKNX.DEFAULT_RATE_LIMIT): vol.All(
             vol.Coerce(int), vol.Range(min=0, max=100)
         ),
@@ -113,7 +113,7 @@ KNX_SCHEMA = vol.Schema(
 
 
 def validate_data_point() -> Callable:
-    """ Ensure that the data point is valid. """
+    """Ensure that the data point is valid."""
 
     def validate(obj: Dict) -> Dict:
         if (
@@ -169,7 +169,7 @@ DATA_POINT_SCHEMA = vol.All(
 
 
 def check_for_valid_parameter_names() -> Callable:
-    """ Check for valid parameter names in the data points section. """
+    """Check for valid parameter names in the data points section."""
 
     def validate(obj: Dict) -> Dict:
         for name in obj.keys():
@@ -182,7 +182,7 @@ def check_for_valid_parameter_names() -> Callable:
 
 
 def check_for_warnings_in_data_points() -> Callable:
-    """ Check for warnings in the data point config section. """
+    """Check for warnings in the data point config section."""
 
     def validate(obj: Dict) -> Dict:
         for name, dp in obj.items():
@@ -255,7 +255,7 @@ class Config:
             "connection_config": ConnectionConfig(
                 connection_type=ConnectionType.TUNNELING
             ),
-            CONF_OWN_ADDRESS: PhysicalAddress(XKNX.DEFAULT_ADDRESS),
+            CONF_OWN_ADDRESS: IndividualAddress(XKNX.DEFAULT_ADDRESS),
             CONF_RATE_LIMIT: XKNX.DEFAULT_RATE_LIMIT,
         }
         self.data_points: Dict[str, dict] = {}
@@ -309,7 +309,7 @@ class Config:
             if CONF_LOCAL_IP in doc[CONF_KNX]:
                 self.knx["connection_config"].local_ip = doc[CONF_KNX][CONF_LOCAL_IP]
             if CONF_OWN_ADDRESS in doc[CONF_KNX]:
-                self.knx[CONF_OWN_ADDRESS] = PhysicalAddress(
+                self.knx[CONF_OWN_ADDRESS] = IndividualAddress(
                     doc[CONF_KNX][CONF_OWN_ADDRESS]
                 )
             if CONF_RATE_LIMIT in doc[CONF_KNX]:

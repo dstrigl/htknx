@@ -11,14 +11,14 @@ from setuptools import find_packages, setup
 
 
 def read(*parts):
-    """ Read file. """
+    """Read file."""
     filename = os.path.join(os.path.abspath(os.path.dirname(__file__)), *parts)
     with open(filename, encoding="utf-8", mode="rt") as fp:
         return fp.read()
 
 
 def get_version():
-    """ Get current version from code. """
+    """Get current version from code."""
     regex = r"__version__\s=\s\"(?P<version>[\d\.]+?)\""
     path = ("htknx", "__version__.py")
     return re.search(regex, read(*path)).group("version")
@@ -34,7 +34,7 @@ with open("HISTORY.md") as history_file:
 
 
 def pip(filename):
-    """ Parse pip reqs file and transform it to setuptools requirements. """
+    """Parse pip reqs file and transform it to setuptools requirements."""
     requirements = []
     for line in io.open(os.path.join("requirements", "{0}.pip".format(filename))):
         line = line.strip()

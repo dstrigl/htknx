@@ -26,16 +26,10 @@ from typing import Any, Callable, Dict, List, TypeVar, Union
 
 import voluptuous as vol
 from xknx.dpt import DPTBase
+from xknx.telegram import GroupAddress, IndividualAddress
 
 # typing typevar
 T = TypeVar("T")
-
-
-KNX_GA_MAX_FREE = 65535
-KNX_GA_REGEX = re_compile(
-    r"^(?P<main>\d{1,2})(/(?P<middle>\d{1,2}))?/(?P<sub>\d{1,4})$"
-)
-KNX_PA_REGEX = re_compile(r"^(?P<area>\d{1,2})\.(?P<main>\d{1,2})\.(?P<line>\d{1,3})$")
 
 
 port = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
@@ -45,10 +39,10 @@ port = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
 # https://github.com/alecthomas/voluptuous/issues/115#issuecomment-144464666
 #
 def has_at_least_one_key(*keys: str) -> Callable:
-    """ Validate that at least one key exists. """
+    """Validate that at least one key exists."""
 
     def validate(obj: Dict) -> Dict:
-        """ Test keys exist in dict. """
+        """Test keys exist in dict."""
         if not isinstance(obj, dict):
             raise vol.Invalid("expected dictionary")
 
@@ -80,7 +74,7 @@ TIME_PERIOD_ERROR = "offset {} should be format 'HH:MM', 'HH:MM:SS' or 'HH:MM:SS
 
 
 def time_period_str(value: str) -> timedelta:
-    """ Validate and transform time offset. """
+    """Validate and transform time offset."""
     if isinstance(value, int):  # type: ignore
         raise vol.Invalid("make sure you wrap time values in quotes")
     if not isinstance(value, str):
@@ -115,7 +109,7 @@ def time_period_str(value: str) -> timedelta:
 
 
 def time_period_seconds(value: Union[float, str]) -> timedelta:
-    """ Validate and transform seconds to a time offset. """
+    """Validate and transform seconds to a time offset."""
     try:
         return timedelta(seconds=float(value))
     except (ValueError, TypeError) as err:
@@ -126,14 +120,14 @@ time_period = vol.Any(time_period_str, time_period_seconds, timedelta, time_peri
 
 
 def positive_timedelta(value: timedelta) -> timedelta:
-    """ Validate timedelta is positive. """
+    """Validate timedelta is positive."""
     if value < timedelta(0):
         raise vol.Invalid("time period should be positive")
     return value
 
 
 def timedelta_greater_zero(value: timedelta) -> timedelta:
-    """ Validate timedelta is greater zero (0). """
+    """Validate timedelta is greater zero (0)."""
     if value <= timedelta(0):
         raise vol.Invalid("time period should be greater zero")
     return value
@@ -144,7 +138,7 @@ time_interval = vol.All(time_period, timedelta_greater_zero)
 
 
 def string(value: Any) -> str:
-    """ Coerce value to string, except for None. """
+    """Coerce value to string, except for None."""
     if value is None:
         raise vol.Invalid("string value is None")
 
@@ -155,7 +149,7 @@ def string(value: Any) -> str:
 
 
 def boolean(value: Any) -> bool:
-    """ Validate and coerce a boolean value. """
+    """Validate and coerce a boolean value."""
     if isinstance(value, bool):
         return value
     if isinstance(value, str):
@@ -171,7 +165,7 @@ def boolean(value: Any) -> bool:
 
 
 def number(value: Any) -> Union[int, float]:
-    """ Validate numeric value. """
+    """Validate numeric value."""
     if type(value) in (int, float):
         return value
     raise vol.Invalid(f"invalid numeric value {value!r}")
@@ -181,35 +175,35 @@ number_greater_zero = vol.All(number, vol.Range(min=0, min_included=False))
 
 
 def ensure_list(value: Union[T, List[T], None]) -> List[T]:
-    """ Wrap value in list if it is not one. """
+    """Wrap value in list if it is not one."""
     if value is None:
         return []
     return value if isinstance(value, list) else [value]
 
 
 def ensure_group_address(value: str) -> str:
-    """ Ensure value is a valid KNX group address. """
+    """Ensure value is a valid KNX group address."""
     value = str(value)
-    if value.isdigit() and 0 <= int(value) <= KNX_GA_MAX_FREE:
+    if value.isdigit() and 0 <= int(value) <= GroupAddress.MAX_FREE:
         return value
 
-    if not KNX_GA_REGEX.match(value):
+    if not GroupAddress.ADDRESS_RE.match(value):
         raise vol.Invalid(f"{value!r} is not a valid group address")
 
     return value
 
 
-def ensure_physical_address(value: str) -> str:
-    """ Ensure value is a valid physical address. """
+def ensure_individual_address(value: str) -> str:
+    """Ensure value is a valid individual address."""
     value = str(value)
-    if not KNX_PA_REGEX.match(value):
-        raise vol.Invalid(f"{value!r} is not a valid physical address")
+    if not IndividualAddress.ADDRESS_RE.match(value):
+        raise vol.Invalid(f"{value!r} is not a valid individual address")
 
     return value
 
 
 def ensure_knx_dpt(value: str) -> str:
-    """ Ensure value is a valid KNX DPT. """
+    """Ensure value is a valid KNX DPT."""
     dpt_class = DPTBase.parse_transcoder(value)
     if dpt_class is None:
         raise vol.Invalid(f"{value!r} is not a valid KNX DPT")
