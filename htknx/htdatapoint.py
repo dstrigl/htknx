@@ -53,7 +53,6 @@ class HtDataPoint(Device):
         super().__init__(xknx, name, device_updated_cb)
         self.hthp = hthp
 
-        self.param_value = None
         if value_type == "binary":
             assert on_change_of_absolute is None and on_change_of_relative is None
             self.param_value = RemoteValueSwitch(
