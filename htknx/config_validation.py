@@ -21,7 +21,6 @@
 
 from datetime import timedelta
 from numbers import Number
-from re import compile as re_compile
 from typing import Any, Callable, Dict, List, TypeVar, Union
 
 import voluptuous as vol
