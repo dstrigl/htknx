@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/htknx.svg)](https://pypi.org/project/htknx)
 [![Python versions](https://img.shields.io/pypi/pyversions/htknx.svg)](https://pypi.org/project/htknx)
 [![License](https://img.shields.io/pypi/l/htknx.svg)](https://pypi.org/project/htknx)
-[![Build status](https://img.shields.io/travis/dstrigl/htknx/master?logo=travis)](https://travis-ci.org/dstrigl/htknx)
+[![Build status](https://github.com/dstrigl/HtREST/workflows/CI/badge.svg)](https://github.com/dstrigl/htknx/actions?query=workflow%3ACI)
 [![Updates](https://pyup.io/repos/github/dstrigl/htknx/shield.svg)](https://pyup.io/repos/github/dstrigl/htknx)
 
 
