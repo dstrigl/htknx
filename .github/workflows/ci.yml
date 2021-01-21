@@ -44,7 +44,7 @@ jobs:
         pip install -r requirements/doc.pip
     - name: Lint with flake8
       run: |
-        flake8 htrest tests setup.py
+        flake8 htknx tests setup.py
     - name: Test with pytest
       run: |
-        pytest htrest tests
+        pytest htknx tests
