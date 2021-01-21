@@ -24,7 +24,6 @@ import asyncio
 import logging
 import logging.config
 import os
-import pprint
 import sys
 import textwrap
 from datetime import timedelta
