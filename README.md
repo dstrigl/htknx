@@ -83,15 +83,47 @@ DISCLAIMER
 ```
 $ htknx /home/pi/my-htknx.yaml
 
+TODO
 ...
 ```
 
 
 ### Configuration
 
-htknx is controlled via a configuration file. Per default the configuration file is named `htknx.yaml`.
+`htknx` is controlled via a configuration file. Per default the configuration file is named `htknx.yaml`.
 
-TODO
+The configuration file can contain the following four sections:
+
+* The `general` section can contain:
+
+    * `update_interval` the update interval to refresh the heat pump parameters (optional, default: `60` seconds)
+    * `cyclic_sending_interval` the time interval for data points that are to be sent cyclically to the KNX bus (optional, default: `10` minutes)
+
+* The `heat_pump` section is needed to specify the connection to the heat pump:
+
+    * `device` the serial device on which the heat pump is connected (e.g. `/dev/ttyUSB0`)
+    * `baudrate` baudrate of the serial connection to the heat pump (same as configured on the heat pump, e.g. `19200`)
+
+* The `knx` section is needed to specify the connection to the KNX interface:
+
+    * `gateway_ip` the ip address of the KNX tunneling interface (e.g. `192.168.11.81`)
+    * `gateway_port` the port the KNX tunneling interface is listening on (optional, default: `3671`)
+    * `auto_reconnect` determines whether to try a reconnect if the connection to the KNX tunneling interface could not be established (optional, default: `true`)
+    * `auto_reconnect_wait` the time to wait for the next auto reconnect (optional, default: `3` seconds)
+    * `local_ip` the local ip address that is used by htknx (e.g. `192.168.11.114`)
+    * `own_address` the individual (physical) address of the htknx daemon (optional, default: `15.15.250`)
+    * `rate_limit` a rate limit for telegrams sent to the KNX bus per second (optional, default: `10`)
+
+* The `data_points` section contains the data points from the heat pump which should be provided to the KNX bus:
+
+    * 'Parameter Name'
+    * `value_type`
+    * `group_address` the KNX group address of the data point (e.g. `1/2/3`)
+    * `writable` determines whether the data point could also be written (optional, default: `false`)
+    * `cyclic_sending` determines whether the data point should be sent cyclically to the KNX bus (optional, default: `false`)
+    * `send_on_change` defines whether the data point should be sent to the KNX bus if it changes for a defined value (optional, default: `false`)
+    * `on_change_of_absolute` the absolute value of change for sending on change (e.g. `0.5` for 0.5°C)
+    * `on_change_of_relative` the relative value of change for sending on change (in percent, e.g. `10` for 10%)
 
 
 ## Credits

@@ -71,6 +71,7 @@ DEFAULT_CYCLIC_SENDING_INTERVAL = 600
 DEFAULT_BAUDRATE = 115200
 DEFAULT_GATEWAY_PORT = 3671
 DEFAULT_AUTO_RECONNECT_WAIT = 3
+DEFAULT_RATE_LIMIT = 10  # XKNX.DEFAULT_RATE_LIMIT
 
 
 GENERAL_SCHEMA = vol.Schema(
@@ -105,7 +106,7 @@ KNX_SCHEMA = vol.Schema(
         vol.Optional(
             CONF_OWN_ADDRESS, default=XKNX.DEFAULT_ADDRESS
         ): cv.ensure_individual_address,
-        vol.Optional(CONF_RATE_LIMIT, default=XKNX.DEFAULT_RATE_LIMIT): vol.All(
+        vol.Optional(CONF_RATE_LIMIT, default=DEFAULT_RATE_LIMIT): vol.All(
             vol.Coerce(int), vol.Range(min=0, max=100)
         ),
     }
@@ -256,7 +257,7 @@ class Config:
                 connection_type=ConnectionType.TUNNELING
             ),
             CONF_OWN_ADDRESS: IndividualAddress(XKNX.DEFAULT_ADDRESS),
-            CONF_RATE_LIMIT: XKNX.DEFAULT_RATE_LIMIT,
+            CONF_RATE_LIMIT: DEFAULT_RATE_LIMIT,
         }
         self.data_points: Dict[str, dict] = {}
         self.notifications: Dict[str, dict] = {}
