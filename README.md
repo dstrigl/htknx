@@ -145,8 +145,25 @@ The configuration file can contain the following four sections:
 
   A list of supported value types can be found in the comments of the [configuration template](https://github.com/dstrigl/htknx/blob/master/htknx/htknx-template.yaml) or [sample configuration file](https://github.com/dstrigl/htknx/blob/master/htknx/htknx.yaml). This are exactly the same value types supported by the [XKNX](https://github.com/XKNX/xknx) module, on which this project is based on.
 
+* The last `notifications` section ...
+
 
 ### Sample configuration
+
+The following block shows a sample configuration for the heat pump parameters
+
+  * *Betriebsart*,
+  * *HKR Soll_Raum*,
+  * *WW Normaltemp.*,
+  * *BSZ Verdichter Betriebsst. ges*,
+  * *Temp. Aussen*,
+  * *Temp. Frischwasser_Istwert*,
+  * *Heizkreispumpe* and
+  * *Stoerung*.
+
+These heat pump parameters are updated every 25 seconds and some of them are sent cyclically to the KNX bus every minute, while some of the other parameters are sent immediately after a change.
+
+In addition, a notification with the current error message is sent to the KNX bus if the heat pump is malfunctioning.
 
 ```
 general:
