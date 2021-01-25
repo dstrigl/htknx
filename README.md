@@ -82,8 +82,25 @@ DISCLAIMER
 
 ```
 $ htknx /home/pi/my-htknx.yaml
-
-TODO
+HTHEATPUMP: load parameter definitions from: /home/pi/venv/htknx/lib/python3.7/site-packages/htheatpump-1.3.1-py3.7.egg/htheatpump/htparams.csv
+Namespace(config_file='/home/pi/my-htknx.yaml', logging_config='/home/pi/prog/htknx/htknx/logging.conf')
+2021-01-25 10:11:02,266 INFO [htknx.__main__|main_async]: Load settings from '/home/pi/my-htknx.yaml'.
+2021-01-25 10:11:02,950 INFO [htknx.__main__|main_async]: Start Heliotherm heat pump KNX gateway v0.1.0.
+2021-01-25 10:11:03,066 INFO [htknx.__main__|main_async]: Connected successfully to heat pump with serial number 123456.
+2021-01-25 10:11:03,115 INFO [htknx.__main__|main_async]: Software version = 3.0.20 (2321)
+2021-01-25 10:11:03,153 WARNING [xknx.log|loop_until_sigint]: Press Ctrl+C to stop
+2021-01-25 10:11:03,159 INFO [htknx.__main__|login_loop]: <<< [ LOGIN (every 0:00:30) ] >>>
+2021-01-25 10:11:03,165 INFO [htknx.__main__|update_loop]: <<< [ UPDATE (every 0:00:25) ] >>>
+2021-01-25 10:11:03,170 INFO [htknx.__main__|cyclic_sending_loop]: <<< [ CYCLIC SENDING (every 0:01:00) ] >>>
+2021-01-25 10:11:03,175 INFO [htknx.__main__|cyclic_sending_loop]: Sending: ['Temp. Aussen', 'Stoerung']
+2021-01-25 10:11:03,714 INFO [htknx.__main__|update_loop]: Update: {'Betriebsart': 1, 'HKR Soll_Raum': 22.0, 'WW Normaltemp.': 50, 'BSZ Verdichter Betriebsst. ges': 11974, 'Temp. Aussen': -1.3, 'Temp. Frischwasser_Istwert': 45.8, 'Heizkreispumpe': True, 'Stoerung': False}
+2021-01-25 10:11:28,750 INFO [htknx.__main__|update_loop]: <<< [ UPDATE (every 0:00:25) ] >>>
+2021-01-25 10:11:29,199 INFO [htknx.__main__|update_loop]: Update: {'Betriebsart': 1, 'HKR Soll_Raum': 22.0, 'WW Normaltemp.': 50, 'BSZ Verdichter Betriebsst. ges': 11974, 'Temp. Aussen': -1.3, 'Temp. Frischwasser_Istwert': 45.7, 'Heizkreispumpe': True, 'Stoerung': False}
+2021-01-25 10:11:33,209 INFO [htknx.__main__|login_loop]: <<< [ LOGIN (every 0:00:30) ] >>>
+2021-01-25 10:11:54,229 INFO [htknx.__main__|update_loop]: <<< [ UPDATE (every 0:00:25) ] >>>
+2021-01-25 10:11:54,691 INFO [htknx.__main__|update_loop]: Update: {'Betriebsart': 1, 'HKR Soll_Raum': 22.0, 'WW Normaltemp.': 50, 'BSZ Verdichter Betriebsst. ges': 11974, 'Temp. Aussen': -1.3, 'Temp. Frischwasser_Istwert': 45.6, 'Heizkreispumpe': True, 'Stoerung': False}
+2021-01-25 10:12:03,190 INFO [htknx.__main__|cyclic_sending_loop]: <<< [ CYCLIC SENDING (every 0:01:00) ] >>>
+2021-01-25 10:12:03,196 INFO [htknx.__main__|cyclic_sending_loop]: Sending: ['Temp. Aussen', 'Stoerung']
 ...
 ```
 
