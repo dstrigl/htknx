@@ -105,7 +105,7 @@ Namespace(config_file='/home/pi/my-htknx.yaml', logging_config='/home/pi/prog/ht
 ```
 
 
-### Configuration
+## Configuration
 
 `htknx` is controlled via a configuration file. Per default the configuration file is named `htknx.yaml`.
 
@@ -135,7 +135,7 @@ The configuration file can contain the following four sections:
 
   Each item in the dictionary consists of the "parameter name" as key and the following properties:
 
-    * `value_type` **TODO**
+    * `value_type` the value type of the data point (e.g. `common_temperature` or `1byte_unsigned`)
     * `group_address` the KNX group address of the data point (e.g. `1/2/3`)
     * `writable` determines whether the data point could also be written (optional, default: `false`)
     * `cyclic_sending` determines whether the data point should be sent cyclically to the KNX bus (optional, default: `false`)
@@ -143,10 +143,114 @@ The configuration file can contain the following four sections:
     * `on_change_of_absolute` the absolute value of change for sending on change (e.g. `0.5` for 0.5°C)
     * `on_change_of_relative` the relative value of change for sending on change (in percent, e.g. `10` for 10%)
 
+  A list of supported value types can be found in the comments of the [configuration template](https://github.com/dstrigl/htknx/blob/master/htknx/htknx-template.yaml) or [sample configuration file](https://github.com/dstrigl/htknx/blob/master/htknx/htknx.yaml). This are exactly the same value types supported by the [XKNX](https://github.com/XKNX/xknx) module, on which this project is based on.
+
+
+### Sample configuration
+
+```
+general:
+  update_interval:
+    seconds: 25
+  cyclic_sending_interval:
+    minutes: 1
+
+heat_pump:
+  device: /dev/ttyUSB0
+  baudrate: 115200
+
+knx:
+  gateway_ip: '192.168.11.81'
+  rate_limit: 10
+#  gateway_port: 3671
+#  auto_reconnect: True
+#  auto_reconnect_wait:
+#    seconds: 3
+#  local_ip: '192.168.11.140'
+#  own_address: '15.15.250'
+
+data_points:
+  # -----------------------------------------------------------------
+  'Betriebsart':
+    # 0 = Aus
+    # 1 = Automatik
+    # 2 = Kühlen
+    # 3 = Sommer
+    # 4 = Dauerbetrieb
+    # 5 = Absenkung
+    # 6 = Urlaub
+    # 7 = Party
+    value_type: '1byte_unsigned'  # DPT-5
+    group_address: '1/7/9'
+    writable: true
+    send_on_change: true
+    on_change_of_absolute: 1
+  # -----------------------------------------------------------------
+  'HKR Soll_Raum':
+    # MIN: 10.0
+    # MAX: 25.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/10'
+    writable: true
+    send_on_change: true
+    on_change_of_absolute: 0.1
+  # -----------------------------------------------------------------
+  'WW Normaltemp.':
+    # MIN: 10
+    # MAX: 75
+    value_type: '1byte_unsigned'  # DPT-5
+    group_address: '1/7/17'
+    writable: true
+    send_on_change: true
+    on_change_of_absolute: 1
+  # -----------------------------------------------------------------
+  'BSZ Verdichter Betriebsst. ges':
+    # MIN: 0
+    # MAX: 100000
+    value_type: '4byte_unsigned'  # DPT-12
+    group_address: '1/7/31'
+  # -----------------------------------------------------------------
+  'Temp. Aussen':
+    # MIN: -20.0
+    # MAX: 40.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/36'
+    cyclic_sending: true
+  # -----------------------------------------------------------------
+  'Temp. Frischwasser_Istwert':
+    # MIN: 0.0
+    # MAX: 70.0
+    value_type: 'common_temperature'  # DPT-14.068
+    group_address: '1/7/45'
+    send_on_change: true
+    on_change_of_relative: 10
+  # -----------------------------------------------------------------
+  'Heizkreispumpe':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/51'
+    send_on_change: true
+  # -----------------------------------------------------------------
+  'Stoerung':
+    # MIN: 0
+    # MAX: 1
+    value_type: 'binary'  # DPT-1
+    group_address: '1/7/56'
+    cyclic_sending: true
+
+notifications:
+  on_malfunction:
+    group_address: '1/7/255'  # DPT-16.000
+    repeat_after:
+      minutes: 10
+```
+
 
 ## Credits
 
-* Project dependencies scanned by [PyUp.io](https://pyup.io).
+* [XKNX](https://xknx.io/) - Asynchronous Python Library for KNX
+* Project dependencies scanned by [PyUp.io](https://pyup.io)
 
 
 ## License
