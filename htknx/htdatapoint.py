@@ -239,7 +239,7 @@ class HtDataPoint(Device):
             if self.send_on_change and (
                 self.last_sent_value is None or numeric_value_changed(value)
             ):
-                _LOGGER.debug(
+                _LOGGER.info(
                     "Update and send DP '%s' [%s]: value=%s (send_on_change: %s,"
                     " on_change_of_absolute: %s, on_change_of_relative: %s, last_sent_value: %s)",
                     self.name,
