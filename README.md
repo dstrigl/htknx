@@ -170,6 +170,7 @@ knx:
 #  own_address: '15.15.250'
 
 data_points:
+  # https://htheatpump.readthedocs.io/en/latest/htparams.html
   # -----------------------------------------------------------------
   'Betriebsart':
     # 0 = Aus
