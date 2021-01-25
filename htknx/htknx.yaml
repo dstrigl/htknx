@@ -224,185 +224,38 @@ data_points:
   
   # https://htheatpump.readthedocs.io/en/latest/htparams.html
   #
-  'Liegenschaft':
-    # MIN: 0
-    # MAX: 2147483647
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/1'
-  # -----------------------------------------------------------------
-  'WP_System':
-    # MIN: 1
-    # MAX: 2
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/2'
-  # -----------------------------------------------------------------
-  'WW Type':
-    # MIN: 0
-    # MAX: 4
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/3'
-  # -----------------------------------------------------------------
-  'FWS Type':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/4'
-  # -----------------------------------------------------------------
-  'Puffer Type':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/5'
-  # -----------------------------------------------------------------
-  'Verdichter_Status':
-    # MIN: 0
-    # MAX: 11
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/6'
-  # -----------------------------------------------------------------
-  'Verdichter laeuft seit':
-    # MIN: 10
-    # MAX: 100000
-    value_type: 'long_delta_timesec'  # DPT-13.100
-    group_address: '1/7/7'
-  # -----------------------------------------------------------------
-  'Verdichter Einschaltverz.(sec)':
-    # MIN: 0
-    # MAX: 10800
-    value_type: 'time_period_sec'  # DPT-7.005
-    group_address: '1/7/8'
-  # -----------------------------------------------------------------
   'Betriebsart':
-    # MIN: 0
-    # MAX: 7
+    # 0 = Aus
+    # 1 = Automatik
+    # 2 = Kühlen
+    # 3 = Sommer
+    # 4 = Dauerbetrieb
+    # 5 = Absenkung
+    # 6 = Urlaub
+    # 7 = Party
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/9'
+    writable: true
+    send_on_change: true
+    on_change_of_absolute: 1
   # -----------------------------------------------------------------
   'HKR Soll_Raum':
     # MIN: 10.0
     # MAX: 25.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/10'
-  # -----------------------------------------------------------------
-  'HKR Aufheiztemp. (K)':
-    # MIN: 1
-    # MAX: 10
-    value_type: 'temperature_difference'  # DPT-14.070
-    group_address: '1/7/11'
-  # -----------------------------------------------------------------
-  'HKR Absenktemp. (K)':
-    # MIN: -10
-    # MAX: -1
-    value_type: 'temperature_difference'  # DPT-14.070
-    group_address: '1/7/12'
-  # -----------------------------------------------------------------
-  'HKR Heizgrenze':
-    # MIN: 0
-    # MAX: 45
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/13'
-  # -----------------------------------------------------------------
-  'HKR RLT Soll_oHG (Heizkurve)':
-    # MIN: 15.0
-    # MAX: 40.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/14'
-  # -----------------------------------------------------------------
-  'HKR RLT Soll_0 (Heizkurve)':
-    # MIN: 20.0
-    # MAX: 50.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/15'
-  # -----------------------------------------------------------------
-  'HKR RLT Soll_uHG (Heizkurve)':
-    # MIN: 25.0
-    # MAX: 60.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/16'
+    writable: true
+    send_on_change: true
+    on_change_of_absolute: 0.1
   # -----------------------------------------------------------------
   'WW Normaltemp.':
     # MIN: 10
     # MAX: 75
     value_type: '1byte_unsigned'  # DPT-5
     group_address: '1/7/17'
-  # -----------------------------------------------------------------
-  'WW Hysterese Normaltemp.':
-    # MIN: 1
-    # MAX: 10
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/18'
-  # -----------------------------------------------------------------
-  'WW Minimaltemp.':
-    # MIN: 5
-    # MAX: 45
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/19'
-  # -----------------------------------------------------------------
-  'WW Hysterese Minimaltemp.':
-    # MIN: 1
-    # MAX: 10
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/20'
-  # -----------------------------------------------------------------
-  'BSZ HKP Betriebsstunden':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/21'
-  # -----------------------------------------------------------------
-  'BSZ HKP Schaltung':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/22'
-  # -----------------------------------------------------------------
-  'BSZ EQ Betriebsstunden':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/23'
-  # -----------------------------------------------------------------
-  'BSZ EQ Schaltungen':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/24'
-  # -----------------------------------------------------------------
-  'BSZ WWV Betriebsstunden':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/25'
-  # -----------------------------------------------------------------
-  'BSZ WWV Schaltungen':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/26'
-  # -----------------------------------------------------------------
-  'BSZ ZIPWW Betriebsstunden':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/27'
-  # -----------------------------------------------------------------
-  'BSZ ZIPWW Schaltungen':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/28'
-  # -----------------------------------------------------------------
-  'BSZ Verdichter Betriebsst. WW':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/29'
-  # -----------------------------------------------------------------
-  'BSZ Verdichter Betriebsst. HKR':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/30'
+    writable: true
+    send_on_change: true
+    on_change_of_absolute: 1
   # -----------------------------------------------------------------
   'BSZ Verdichter Betriebsst. ges':
     # MIN: 0
@@ -410,185 +263,34 @@ data_points:
     value_type: '4byte_unsigned'  # DPT-12
     group_address: '1/7/31'
   # -----------------------------------------------------------------
-  'BSZ Verdichter akt. Laufzeit':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/32'
-  # -----------------------------------------------------------------
-  'MKR2 Aktiviert':
-    # MIN: 0
-    # MAX: 2
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/33'
-  # -----------------------------------------------------------------
-  'Energiezaehler':
-    # MIN: 0
-    # MAX: 2
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/34'
-  # -----------------------------------------------------------------
-  'BSZ Verdichter Schaltung WW':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/35'
-  # -----------------------------------------------------------------
   'Temp. Aussen':
     # MIN: -20.0
     # MAX: 40.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/36'
-  # -----------------------------------------------------------------
-  'Temp. Aussen verzoegert':
-    # MIN: -20.0
-    # MAX: 40.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/37'
-  # -----------------------------------------------------------------
-  'Temp. Brauchwasser':
-    # MIN: 0.0
-    # MAX: 70.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/38'
-  # -----------------------------------------------------------------
-  'Temp. Vorlauf':
-    # MIN: 0.0
-    # MAX: 70.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/39'
-  # -----------------------------------------------------------------
-  'Temp. Ruecklauf':
-    # MIN: 0.0
-    # MAX: 70.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/40'
-  # -----------------------------------------------------------------
-  'Temp. EQ_Eintritt':
-    # MIN: -20.0
-    # MAX: 30.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/42'
-  # -----------------------------------------------------------------
-  'Temp. EQ_Austritt':
-    # MIN: -20.0
-    # MAX: 30.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/43'
-  # -----------------------------------------------------------------
-  'Temp. Sauggas':
-    # MIN: -20.0
-    # MAX: 30.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/44'
+    cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. Frischwasser_Istwert':
     # MIN: 0.0
     # MAX: 70.0
     value_type: 'common_temperature'  # DPT-14.068
     group_address: '1/7/45'
-  # -----------------------------------------------------------------
-  'Temp. Verdampfung':
-    # MIN: -50.0
-    # MAX: 30.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/46'
-  # -----------------------------------------------------------------
-  'Temp. Kondensation':
-    # MIN: -50.0
-    # MAX: 60.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/47'
-  # -----------------------------------------------------------------
-  'Temp. Heissgas':
-    # MIN: 0.0
-    # MAX: 150.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/48'
-  # -----------------------------------------------------------------
-  'Niederdruck (bar)':
-    # MIN: 0.0
-    # MAX: 18.0
-    value_type: '4byte_float'  # DPT-14
-    group_address: '1/7/49'
-  # -----------------------------------------------------------------
-  'Hochdruck (bar)':
-    # MIN: 0.0
-    # MAX: 40.0
-    value_type: '4byte_float'  # DPT-14
-    group_address: '1/7/50'
+    send_on_change: true
+    on_change_of_relative: 10
   # -----------------------------------------------------------------
   'Heizkreispumpe':
     # MIN: 0
     # MAX: 1
     value_type: 'binary'  # DPT-1
     group_address: '1/7/51'
-  # -----------------------------------------------------------------
-  'EQ Pumpe (Ventilator)':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/52'
-  # -----------------------------------------------------------------
-  'Warmwasservorrang':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/53'
-  # -----------------------------------------------------------------
-  'Zirkulationspumpe WW':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/54'
-  # -----------------------------------------------------------------
-  'Verdichter':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/55'
+    send_on_change: true
   # -----------------------------------------------------------------
   'Stoerung':
     # MIN: 0
     # MAX: 1
     value_type: 'binary'  # DPT-1
     group_address: '1/7/56'
-  # -----------------------------------------------------------------
-  'Hauptschalter':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/57'
-  # -----------------------------------------------------------------
-  'FWS Stroemungsschalter':
-    # MIN: 0
-    # MAX: 1
-    value_type: 'binary'  # DPT-1
-    group_address: '1/7/58'
-  # -----------------------------------------------------------------
-  'BSZ Verdichter Schaltungen':
-    # MIN: 0
-    # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
-    group_address: '1/7/59'
-  # -----------------------------------------------------------------
-  'Frischwasserpumpe':
-    # MIN: 0
-    # MAX: 100
-    value_type: 'percentU8'  # DPT-5.004
-    group_address: '1/7/60'
-  # -----------------------------------------------------------------
-  'Verdichteranforderung':
-    # MIN: 0
-    # MAX: 5
-    value_type: '1byte_unsigned'  # DPT-5
-    group_address: '1/7/61'
-  # -----------------------------------------------------------------
-  'HKR_Sollwert':
-    # MIN: 0.0
-    # MAX: 50.0
-    value_type: 'common_temperature'  # DPT-14.068
-    group_address: '1/7/62'
+    cyclic_sending: true
 
 
 notifications:

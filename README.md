@@ -114,10 +114,11 @@ The configuration file can contain the following four sections:
     * `own_address` the individual (physical) address of the htknx daemon (optional, default: `15.15.250`)
     * `rate_limit` a rate limit for telegrams sent to the KNX bus per second (optional, default: `10`)
 
-* The `data_points` section contains the data points from the heat pump which should be provided to the KNX bus:
+* The `data_points` section contains the dictionary of [heat pump parameters](https://htheatpump.readthedocs.io/en/latest/htparams.html) for which a data point should be provided to the KNX bus.
 
-    * 'Parameter Name'
-    * `value_type`
+  Each item in the dictionary consists of the "parameter name" as key and the following properties:
+
+    * `value_type` **TODO**
     * `group_address` the KNX group address of the data point (e.g. `1/2/3`)
     * `writable` determines whether the data point could also be written (optional, default: `false`)
     * `cyclic_sending` determines whether the data point should be sent cyclically to the KNX bus (optional, default: `false`)
