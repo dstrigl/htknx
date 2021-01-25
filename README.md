@@ -145,7 +145,7 @@ The configuration file can contain the following four sections:
 
   A list of supported value types can be found in the comments of the [configuration template](https://github.com/dstrigl/htknx/blob/master/htknx/htknx-template.yaml) or [sample configuration file](https://github.com/dstrigl/htknx/blob/master/htknx/htknx.yaml). This are exactly the same value types supported by the [XKNX](https://github.com/XKNX/xknx) module, on which this project is based on.
 
-* The last `notifications` section ...
+* The last `notifications` section ... **TODO**
 
 
 ### Sample configuration

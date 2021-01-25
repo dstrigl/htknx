@@ -178,7 +178,7 @@ class HtDataPoint(Device):
                 elif param.dp_type == HtDataTypes.BOOL:
                     value = bool(value)
                 else:
-                    assert 0, "Invalid dp_type"
+                    assert 0, f"Invalid dp_type ({param.dp_type})"
                 value = await self.hthp.set_param_async(self.name, value)
                 self.param_value.payload = self.param_value.to_knx(value)
             except Exception as ex:
