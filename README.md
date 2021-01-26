@@ -109,7 +109,7 @@ Namespace(config_file='/home/pi/my-htknx.yaml', logging_config='/home/pi/prog/ht
 
 `htknx` is controlled via a configuration file. Per default the configuration file is named `htknx.yaml`.
 
-The configuration file can contain the following four sections:
+The configuration file can contain the following five sections:
 
 * The `general` section can contain:
 
@@ -145,7 +145,14 @@ The configuration file can contain the following four sections:
 
   A list of supported value types can be found in the comments of the [configuration template](https://github.com/dstrigl/htknx/blob/master/htknx/htknx-template.yaml) or [sample configuration file](https://github.com/dstrigl/htknx/blob/master/htknx/htknx.yaml). This are exactly the same value types supported by the [XKNX](https://github.com/XKNX/xknx) module, on which this project is based on.
 
-* The last `notifications` section ... **TODO**
+* The `notifications` section contains the setup of the different supported notifications (optional).
+
+  At the moment the following notifications are supported:
+
+  * `on_malfunction` which sends a notification with the current error message (as DPT-16.000) to the KNX bus if the heat pump is malfunctioning:
+
+      * `group_address` the KNX group address under which the error message is sent (e.g. `1/2/255`)
+      * `repeat_after` the time interval until the notification should be repeated if the heat pump is still malfunctioning (optional, e.g.  `10` minutes)
 
 
 ### Sample configuration
