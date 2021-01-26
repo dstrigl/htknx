@@ -135,9 +135,9 @@ The configuration file can contain the following five sections:
 
   Each item in the dictionary consists of the "parameter name" as key and the following properties:
 
-    * `value_type` the value type of the data point (e.g. `common_temperature`, `1byte_unsigned`, etc. as supported by [XKNX](https://github.com/XKNX/xknx))
+    * `value_type` the value type of the data point (e.g. `binary`, `common_temperature`, `1byte_unsigned`, `4byte_unsigned`, etc. as supported by [XKNX](https://github.com/XKNX/xknx))
     * `group_address` the KNX group address of the data point (e.g. `1/2/3`)
-    * `writable` determines whether the data point could also be written (optional, default: `false`)
+    * `writable` determines whether the data point could also be written or not (optional, default: `false`)
     * `cyclic_sending` determines whether the data point should be sent cyclically to the KNX bus (optional, default: `false`)
     * `send_on_change` defines whether the data point should be sent to the KNX bus if it changes for a defined value (optional, default: `false`)
     * `on_change_of_absolute` the absolute value of change for sending on change (e.g. `0.5` for 0.5°C)
