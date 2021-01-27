@@ -6,6 +6,7 @@
 [![Build status](https://github.com/dstrigl/HtREST/workflows/CI/badge.svg)](https://github.com/dstrigl/htknx/actions?query=workflow%3ACI)
 [![Updates](https://pyup.io/repos/github/dstrigl/htknx/shield.svg)](https://pyup.io/repos/github/dstrigl/htknx)
 
+![KNX](knx-logo.png)
 
 [Heliotherm](http://www.heliotherm.com/) heat pump [KNX](https://www.knx.org) gateway for Python 3.7 and 3.8.
 
@@ -81,7 +82,7 @@ DISCLAIMER
 ```
 
 
-### Example
+### Example:
 
 ```
 $ htknx /home/pi/my-htknx.yaml
@@ -158,7 +159,7 @@ The configuration file can contain the following five sections:
       * `repeat_after` the time interval until the notification should be repeated if the heat pump is still malfunctioning (optional, e.g.  `10` minutes)
 
 
-### Sample configuration
+### Sample configuration:
 
 The following block shows a sample configuration for the heat pump parameters
 
