@@ -26,7 +26,7 @@ from typing import Optional
 from htheatpump import AioHtHeatpump
 from xknx import XKNX
 from xknx.devices import Notification
-from xknx.telegram import GroupAddress
+from xknx.telegram import GroupAddress, TelegramDirection
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,6 +63,36 @@ class HtFaultNotification(Notification):
     @property
     def group_address(self) -> GroupAddress:
         return self._message.group_address
+
+    async def process_group_read(self, telegram):
+        """Process incoming GROUP READ telegram."""
+        if telegram.direction == TelegramDirection.OUTGOING:
+            return
+        _LOGGER.info(
+            "Received GROUP READ telegram for DP '%s' [%s]: %s",
+            self.name,
+            self.group_address,
+            telegram,
+        )
+        try:
+            # query for the last fault message of the heat pump
+            idx, err, dt, msg = await self.hthp.get_last_fault_async()
+            _LOGGER.info("ERROR #%s [%s]: %s, %s", idx, dt.isoformat(), err, msg)
+            # and send it as notification on the KNX bus
+            await self.set(msg)
+        except Exception as ex:
+            _LOGGER.exception(ex)
+
+    async def process_group_write(self, telegram):
+        """Process incoming GROUP WRITE telegram."""
+        if telegram.direction == TelegramDirection.OUTGOING:
+            return
+        _LOGGER.warning(
+            "Ignored received GROUP WRITE telegram for DP '%s' [%s]: %s",
+            self.name,
+            self.group_address,
+            telegram,
+        )
 
     async def do(self):
         """Execute the 'do' command."""
