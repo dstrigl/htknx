@@ -130,7 +130,7 @@ The configuration file can contain the following five sections:
     * `device` the serial device on which the heat pump is connected (e.g. `/dev/ttyUSB0`)
     * `baudrate` baudrate of the serial connection to the heat pump (same as configured on the heat pump, e.g. `19200`)
 
-* The `knx` section is needed to specify the connection to the KNX interface:
+* The `knx` section is needed to specify the connection to the KNX interface (e.g. a [Weinzierl KNX IP Interface 731](https://www.weinzierl.de/index.php/de/alles-knx1/knx-devices/knx-ip-interface-731-de)):
 
     * `gateway_ip` the ip address of the KNX tunneling interface (e.g. `192.168.11.81`)
     * `gateway_port` the port the KNX tunneling interface is listening on (optional, default: `3671`)
