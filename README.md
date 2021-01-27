@@ -7,7 +7,10 @@
 [![Updates](https://pyup.io/repos/github/dstrigl/htknx/shield.svg)](https://pyup.io/repos/github/dstrigl/htknx)
 
 
-[Heliotherm](http://www.heliotherm.com/) heat pump KNX gateway for Python 3.7 and 3.8.
+[Heliotherm](http://www.heliotherm.com/) heat pump [KNX](https://www.knx.org) gateway for Python 3.7 and 3.8.
+
+Can be used to provide the [Heliotherm heat pump parameters](https://htheatpump.readthedocs.io/en/latest/htparams.html) as a data point to the KNX bus.
+
 
 * GitHub repo: https://github.com/dstrigl/htknx
 * Free software: [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.en.html)
@@ -127,8 +130,8 @@ The configuration file can contain the following five sections:
     * `gateway_port` the port the KNX tunneling interface is listening on (optional, default: `3671`)
     * `auto_reconnect` determines whether to try a reconnect if the connection to the KNX tunneling interface could not be established (optional, default: `true`)
     * `auto_reconnect_wait` the time to wait for the next auto reconnect (optional, default: `3` seconds)
-    * `local_ip` the local ip address that is used by htknx (e.g. `192.168.11.114`)
-    * `own_address` the individual (physical) address of the htknx daemon (optional, default: `15.15.250`)
+    * `local_ip` the local ip address that is used to connect to the KNX tunneling interface (optional, e.g. `192.168.11.114`)
+    * `own_address` the individual (physical) address of this gateway (optional, default: `15.15.250`)
     * `rate_limit` a rate limit for telegrams sent to the KNX bus per second (optional, default: `10`)
 
 * The `data_points` section contains the dictionary of [heat pump parameters](https://htheatpump.readthedocs.io/en/latest/htparams.html) for which a data point should be provided to the KNX bus.
@@ -143,7 +146,7 @@ The configuration file can contain the following five sections:
     * `on_change_of_absolute` the absolute value of change for sending on change (e.g. `0.5` for 0.5°C)
     * `on_change_of_relative` the relative value of change for sending on change (in percent, e.g. `10` for 10%)
 
-  A list of supported value types can be found in the comments of the [configuration template](https://github.com/dstrigl/htknx/blob/master/htknx/htknx-template.yaml) or [sample configuration file](https://github.com/dstrigl/htknx/blob/master/htknx/htknx.yaml). This are exactly the same value types supported by the [XKNX](https://github.com/XKNX/xknx) module, on which this project is based on.
+  A list of supported value types can be found in the comments of the [configuration template](https://github.com/dstrigl/htknx/blob/master/htknx/htknx-template.yaml) or [sample configuration file](https://github.com/dstrigl/htknx/blob/master/htknx/htknx.yaml). These are exactly the same value types supported by the [XKNX](https://github.com/XKNX/xknx) module on which this project is based.
 
 * The `notifications` section contains the setup of the different supported notifications (optional).
 
