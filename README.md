@@ -274,6 +274,10 @@ notifications:
       minutes: 10
 ```
 
+The following image shows a screenshot of the [Group Monitor](https://support.knx.org/hc/en-us/articles/360011717719-Monitor) of the ETS application with the data points provided by the upper sample configuration.
+
+![ETS Group Monitor](group-monitoring.png)
+
 
 ## Credits
 
