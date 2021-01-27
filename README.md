@@ -235,7 +235,7 @@ data_points:
   'BSZ Verdichter Betriebsst. ges':
     # MIN: 0
     # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12
+    value_type: '4byte_unsigned'  # DPT-12.102
     group_address: '1/7/31'
   # -----------------------------------------------------------------
   'Temp. Aussen':
