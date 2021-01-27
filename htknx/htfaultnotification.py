@@ -69,7 +69,7 @@ class HtFaultNotification(Notification):
         if telegram.direction == TelegramDirection.OUTGOING:
             return
         _LOGGER.info(
-            "Received GROUP READ telegram for DP '%s' [%s]: %s",
+            "Received GROUP READ telegram for notification '%s' [%s]: %s",
             self.name,
             self.group_address,
             telegram,
@@ -88,7 +88,7 @@ class HtFaultNotification(Notification):
         if telegram.direction == TelegramDirection.OUTGOING:
             return
         _LOGGER.warning(
-            "Ignored received GROUP WRITE telegram for DP '%s' [%s]: %s",
+            "Ignored received GROUP WRITE telegram for notification '%s' [%s]: %s",
             self.name,
             self.group_address,
             telegram,
