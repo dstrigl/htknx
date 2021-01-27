@@ -173,6 +173,8 @@ The following block shows a sample configuration for the heat pump parameters
 
 These heat pump parameters are updated every 25 seconds and some of them are sent cyclically to the KNX bus every minute, while some of the other parameters are sent immediately after a change.
 
+Only the two parameters *"Betriebsart"* and *"HKR Soll_Raum"* are writable.
+
 In addition, a notification with the current error message is sent to the KNX bus if the heat pump is malfunctioning.
 
 ```
