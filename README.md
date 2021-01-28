@@ -34,6 +34,13 @@ Can be used to provide the [Heliotherm heat pump parameters](https://htheatpump.
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/N362PLZ)
 
 
+## Setup
+
+The following diagram shows the schematic view of the setup:
+
+![Setup](setup.png)
+
+
 ## Installation
 
 You can install or upgrade `htknx` with:
