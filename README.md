@@ -186,7 +186,7 @@ The following block shows a sample configuration for the heat pump parameters
 
 These heat pump parameters are updated every 25 seconds and some of them are sent cyclically to the KNX bus every minute, while some of the other parameters are sent immediately after a change.
 
-Only the two parameters *"Betriebsart"* and *"HKR Soll_Raum"* are writable.
+Only the three parameters *"Betriebsart"*, *"HKR Soll_Raum"* and *"WW Normaltemp."* are writable.
 
 In addition, a notification with the current error message is sent to the KNX bus if the heat pump is malfunctioning.
 
@@ -223,7 +223,7 @@ data_points:
     # 5 = Absenkung
     # 6 = Urlaub
     # 7 = Party
-    value_type: '1byte_unsigned'  # DPT-5
+    value_type: '1byte_unsigned'  # DPT-5.005 (Dezimalfaktor 0..255)
     group_address: '1/7/9'
     writable: true
     send_on_change: true
@@ -232,7 +232,7 @@ data_points:
   'HKR Soll_Raum':
     # MIN: 10.0
     # MAX: 25.0
-    value_type: 'common_temperature'  # DPT-14.068
+    value_type: 'common_temperature'  # DPT-14.068 (Temperatur °C)
     group_address: '1/7/10'
     writable: true
     send_on_change: true
@@ -241,7 +241,7 @@ data_points:
   'WW Normaltemp.':
     # MIN: 10
     # MAX: 75
-    value_type: '1byte_unsigned'  # DPT-5
+    value_type: '1byte_unsigned'  # DPT-5.005 (Dezimalfaktor 0..255)
     group_address: '1/7/17'
     writable: true
     send_on_change: true
@@ -250,20 +250,20 @@ data_points:
   'BSZ Verdichter Betriebsst. ges':
     # MIN: 0
     # MAX: 100000
-    value_type: '4byte_unsigned'  # DPT-12.102
+    value_type: '4byte_unsigned'  # DPT-12.102 (Zähler Zeit Stunden)
     group_address: '1/7/31'
   # -----------------------------------------------------------------
   'Temp. Aussen':
     # MIN: -20.0
     # MAX: 40.0
-    value_type: 'common_temperature'  # DPT-14.068
+    value_type: 'common_temperature'  # DPT-14.068 (Temperatur °C)
     group_address: '1/7/36'
     cyclic_sending: true
   # -----------------------------------------------------------------
   'Temp. Frischwasser_Istwert':
     # MIN: 0.0
     # MAX: 70.0
-    value_type: 'common_temperature'  # DPT-14.068
+    value_type: 'common_temperature'  # DPT-14.068 (Temperatur °C)
     group_address: '1/7/45'
     send_on_change: true
     on_change_of_relative: 10
@@ -271,20 +271,20 @@ data_points:
   'Heizkreispumpe':
     # MIN: 0
     # MAX: 1
-    value_type: 'binary'  # DPT-1
+    value_type: 'binary'  # DPT-1.011 (Status)
     group_address: '1/7/51'
     send_on_change: true
   # -----------------------------------------------------------------
   'Stoerung':
     # MIN: 0
     # MAX: 1
-    value_type: 'binary'  # DPT-1
+    value_type: 'binary'  # DPT-1.005 (Alarm)
     group_address: '1/7/56'
     cyclic_sending: true
 
 notifications:
   on_malfunction:
-    group_address: '1/7/255'  # DPT-16.000
+    group_address: '1/7/255'  # DPT-16.000 (Zeichen ASCII)
     repeat_after:
       minutes: 10
 ```
