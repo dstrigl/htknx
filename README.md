@@ -10,7 +10,7 @@
 
 [Heliotherm](http://www.heliotherm.com/) heat pump [KNX](https://www.knx.org) gateway for Python 3.7 and 3.8.
 
-It can be used to provide the different [Heliotherm heat pump parameters](https://htheatpump.readthedocs.io/en/latest/htparams.html) as data points to the KNX bus.
+Can be used to provide the different [Heliotherm heat pump parameters](https://htheatpump.readthedocs.io/en/latest/htparams.html) as data points to the KNX bus.
 
 
 * GitHub repo: https://github.com/dstrigl/htknx
