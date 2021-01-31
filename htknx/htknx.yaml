@@ -252,6 +252,8 @@ data_points:
     # MIN: 10
     # MAX: 75
     value_type: '1byte_unsigned'  # DPT-5.005 (Dezimalfaktor 0..255)
+    # or:
+    # value_type: 'common_temperature'  # DPT-14.068 (Temperatur °C)
     group_address: '1/7/17'
     writable: true
     send_on_change: true
