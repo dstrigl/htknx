@@ -226,7 +226,7 @@ class HtPublisher:
                 synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
                 - dt.datetime.now()
             ).total_seconds()
-            _synchronize_clock_callback = loop.call_later(
+            self._synchronize_clock_callback = loop.call_later(
                 delay, synchronize_clock_callback, synchronize_clock_weekly
             )
 

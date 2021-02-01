@@ -9,7 +9,7 @@ general:
     minutes: 1
   synchronize_clock_weekly:
     weekday: mon
-    time: 17:45
+    time: '17:45'
 
 heat_pump:
   device: /dev/ttyUSB0
