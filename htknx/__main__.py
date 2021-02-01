@@ -59,7 +59,7 @@ class HtPublisher:
         notifications: Dict[str, Type[Notification]],
         update_interval: dt.timedelta,
         cyclic_sending_interval: dt.timedelta,
-        synchronize_clock_weekly: Optional[Dict],
+        synchronize_clock_weekly: Optional[dict],
     ):
         """Initialize the HtPublisher class."""
         self._hthp = hthp
@@ -200,12 +200,12 @@ class HtPublisher:
         return None
 
     def _create_synchronize_clock_callback(
-        self, synchronize_clock_weekly: Optional[Dict]
+        self, synchronize_clock_weekly: Optional[dict]
     ) -> Optional[asyncio.TimerHandle]:
         """Create a callback to synchronize the clock of the heat pump."""
 
         async def synchronize_clock_callback(
-            self, synchronize_clock_weekly: Optional[Dict]
+            self, synchronize_clock_weekly: Optional[dict]
         ):
             """Callback function to synchronize the clock of the heat pump."""
             if dt.datetime.now().weekday() == WEEKDAYS.index(
@@ -224,7 +224,7 @@ class HtPublisher:
                     _LOGGER.exception(ex)
             delay = (
                 synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
-                - dt.datetime.now()
+                - dt.datetime.now().time()
             ).total_seconds()
             self._synchronize_clock_callback = loop.call_later(
                 delay, synchronize_clock_callback, synchronize_clock_weekly
@@ -234,7 +234,7 @@ class HtPublisher:
             loop = asyncio.get_event_loop()
             delay = (
                 synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
-                - dt.datetime.now()
+                - dt.datetime.now().time()
             ).total_seconds()
             return loop.call_later(
                 delay, synchronize_clock_callback, synchronize_clock_weekly
