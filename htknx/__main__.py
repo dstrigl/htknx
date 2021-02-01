@@ -204,9 +204,7 @@ class HtPublisher:
     ) -> Optional[asyncio.TimerHandle]:
         """Create a callback to synchronize the clock of the heat pump."""
 
-        async def synchronize_clock_callback(
-            self, synchronize_clock_weekly: Optional[dict]
-        ):
+        async def synchronize_clock_callback(self, synchronize_clock_weekly: dict):
             """Callback function to synchronize the clock of the heat pump."""
             now = dt.datetime.now()
             if now.weekday() == WEEKDAYS.index(
@@ -230,7 +228,7 @@ class HtPublisher:
                 - now
             ).total_seconds()
             self._synchronize_clock_callback = loop.call_later(
-                delay, synchronize_clock_callback, synchronize_clock_weekly
+                delay, synchronize_clock_callback, self, synchronize_clock_weekly
             )
 
         if synchronize_clock_weekly is not None:
@@ -243,7 +241,7 @@ class HtPublisher:
                 - now
             ).total_seconds()
             return loop.call_later(
-                delay, synchronize_clock_callback, synchronize_clock_weekly
+                delay, synchronize_clock_callback, self, synchronize_clock_weekly
             )
         return None
 
