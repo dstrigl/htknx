@@ -19,9 +19,10 @@
 
 """ Helpers for config validation using voluptuous. """
 
-from datetime import timedelta
+from datetime import time as dt_time, timedelta
+
 from numbers import Number
-from typing import Any, Callable, Dict, List, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
 
 import voluptuous as vol
 from xknx.dpt import DPTBase
@@ -29,6 +30,9 @@ from xknx.telegram import GroupAddress, IndividualAddress
 
 # typing typevar
 T = TypeVar("T")
+
+
+WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 
 port = vol.All(vol.Coerce(int), vol.Range(min=1, max=65535))
@@ -134,6 +138,40 @@ def timedelta_greater_zero(value: timedelta) -> timedelta:
 
 # time_interval = vol.All(time_period, positive_timedelta)
 time_interval = vol.All(time_period, timedelta_greater_zero)
+
+
+def parse_time(time_str: str) -> Optional[dt_time]:
+    """Parse a time string (e.g. '00:20:00') into Time object.
+
+    Return None if invalid.
+    """
+    parts = str(time_str).split(":")
+    if len(parts) < 2:
+        return None
+    try:
+        hour = int(parts[0])
+        minute = int(parts[1])
+        second = int(parts[2]) if len(parts) > 2 else 0
+        return dt_time(hour, minute, second)
+    except ValueError:
+        # ValueError if value cannot be converted to an int or not in range
+        return None
+
+
+def time(value: Any) -> dt_time:
+    """Validate and transform a time."""
+    if isinstance(value, dt_time):
+        return value
+
+    try:
+        time_val = parse_time(value)
+    except TypeError as err:
+        raise vol.Invalid("not a parseable type") from err
+
+    if time_val is None:
+        raise vol.Invalid(f"invalid time specified: {value}")
+
+    return time_val
 
 
 def string(value: Any) -> str:

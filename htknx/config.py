@@ -38,6 +38,9 @@ _LOGGER = logging.getLogger(__name__)
 CONF_GENERAL = "general"
 CONF_UPDATE_INTERVAL = "update_interval"
 CONF_CYCLIC_SENDING_INTERVAL = "cyclic_sending_interval"
+CONF_SYNCHRONIZE_CLOCK_WEEKLY = "synchronize_clock_weekly"
+CONF_SYNCHRONIZE_CLOCK_WEEKDAY = "weekday"
+CONF_SYNCHRONIZE_CLOCK_TIME = "time"
 
 CONF_HEAT_PUMP = "heat_pump"
 CONF_DEVICE = "device"
@@ -74,6 +77,13 @@ DEFAULT_AUTO_RECONNECT_WAIT = 3
 DEFAULT_RATE_LIMIT = 10  # XKNX.DEFAULT_RATE_LIMIT
 
 
+SYNCHRONIZE_CLOCK_WEEKLY_SCHEMA = vol.Schema(
+    {
+        CONF_SYNCHRONIZE_CLOCK_WEEKDAY: vol.All(cv.string, vol.In(cv.WEEKDAYS)),
+        CONF_SYNCHRONIZE_CLOCK_TIME: cv.time,
+    }
+)
+
 GENERAL_SCHEMA = vol.Schema(
     {
         vol.Optional(
@@ -82,6 +92,9 @@ GENERAL_SCHEMA = vol.Schema(
         vol.Optional(
             CONF_CYCLIC_SENDING_INTERVAL, default=DEFAULT_CYCLIC_SENDING_INTERVAL
         ): cv.time_interval,
+        vol.Optional(
+            CONF_SYNCHRONIZE_CLOCK_WEEKLY, default=None
+        ): SYNCHRONIZE_CLOCK_WEEKLY_SCHEMA,
     }
 )
 
@@ -247,6 +260,7 @@ class Config:
         self.general: Dict[str, Any] = {
             CONF_UPDATE_INTERVAL: timedelta(DEFAULT_UPDATE_INTERVAL),
             CONF_CYCLIC_SENDING_INTERVAL: timedelta(DEFAULT_CYCLIC_SENDING_INTERVAL),
+            CONF_SYNCHRONIZE_CLOCK_WEEKLY: None,
         }
         self.heat_pump: Dict[str, Any] = {
             CONF_DEVICE: None,

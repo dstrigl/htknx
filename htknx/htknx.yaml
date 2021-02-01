@@ -7,6 +7,9 @@ general:
     seconds: 25
   cyclic_sending_interval:
     minutes: 1
+  synchronize_clock_weekly:
+    weekday: mon
+    time: 17:45
 
 heat_pump:
   device: /dev/ttyUSB0
@@ -25,7 +28,8 @@ knx:
 data_points:
   #
   # Supported KNX value types:
-  # --------------------------
+  # (see also https://github.com/XKNX/xknx)
+  # ---------------------------------------
   #
   #   - DPT-1.***: binary
   #

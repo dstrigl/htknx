@@ -26,7 +26,7 @@ import logging.config
 import os
 import sys
 import textwrap
-from datetime import timedelta
+import datetime as dt
 from typing import Dict, Optional, Type
 
 from htheatpump import AioHtHeatpump
@@ -34,14 +34,19 @@ from xknx import XKNX
 from xknx.devices import Notification
 
 from .__version__ import __version__
-from .config import Config
+from .config import (
+    Config,
+    CONF_SYNCHRONIZE_CLOCK_WEEKDAY,
+    CONF_SYNCHRONIZE_CLOCK_TIME,
+)
+from .config_validation import WEEKDAYS
 from .htdatapoint import HtDataPoint
 from .htfaultnotification import HtFaultNotification
 
 _LOGGER = logging.getLogger(__name__)
 
 
-DEFAULT_LOGIN_INTERVAL = timedelta(seconds=30)
+DEFAULT_LOGIN_INTERVAL = dt.timedelta(seconds=30)
 
 
 class HtPublisher:
@@ -52,8 +57,9 @@ class HtPublisher:
         hthp: AioHtHeatpump,
         data_points: Dict[str, HtDataPoint],
         notifications: Dict[str, Type[Notification]],
-        update_interval: timedelta,
-        cyclic_sending_interval: timedelta,
+        update_interval: dt.timedelta,
+        cyclic_sending_interval: dt.timedelta,
+        synchronize_clock_weekly: Optional[Dict],
     ):
         """Initialize the HtPublisher class."""
         self._hthp = hthp
@@ -61,9 +67,11 @@ class HtPublisher:
         self._notifications = notifications
         self._update_interval = update_interval
         self._cyclic_sending_interval = cyclic_sending_interval
+        self._synchronize_clock_weekly = synchronize_clock_weekly
         self._login_task: Optional[asyncio.Task] = None
         self._update_task: Optional[asyncio.Task] = None
         self._cyclic_sending_task: Optional[asyncio.Task] = None
+        self._synchronize_clock_callback: Optional[asyncio.TimerHandle] = None
 
     def __del__(self):
         """Destructor, cleaning up if this was not done before."""
@@ -79,6 +87,10 @@ class HtPublisher:
             self._cyclic_sending_task = self._create_cyclic_sending_task(
                 self._cyclic_sending_interval
             )
+        if self._synchronize_clock_callback is None:
+            self._synchronize_clock_callback = self._create_synchronize_clock_callback(
+                self._synchronize_clock_weekly
+            )
 
     def stop(self) -> None:
         """Stop the HtPublisher."""
@@ -91,6 +103,9 @@ class HtPublisher:
         if self._cyclic_sending_task is not None:
             self._cyclic_sending_task.cancel()
             self._cyclic_sending_task = None
+        if self._synchronize_clock_callback is not None:
+            self._synchronize_clock_callback.cancel()
+            self._synchronize_clock_callback = None
 
     def __enter__(self) -> "HtPublisher":
         """Start the HtPublisher from context manager."""
@@ -101,10 +116,12 @@ class HtPublisher:
         """Stop the HtPublisher from context manager."""
         self.stop()
 
-    def _create_login_task(self, login_interval: timedelta) -> Optional[asyncio.Task]:
+    def _create_login_task(
+        self, login_interval: dt.timedelta
+    ) -> Optional[asyncio.Task]:
         """Create an asyncio.Task to periodically login to the heat pump."""
 
-        async def login_loop(self, login_interval: timedelta):
+        async def login_loop(self, login_interval: dt.timedelta):
             """Endless loop to periodically login to the heat pump."""
             while True:
                 _LOGGER.info("<<< [ LOGIN (every %s) ] >>>", login_interval)
@@ -120,10 +137,12 @@ class HtPublisher:
             return loop.create_task(login_loop(self, login_interval=login_interval))
         return None
 
-    def _create_update_task(self, update_interval: timedelta) -> Optional[asyncio.Task]:
+    def _create_update_task(
+        self, update_interval: dt.timedelta
+    ) -> Optional[asyncio.Task]:
         """Create an asyncio.Task for updating the heat pump parameter values periodically."""
 
-        async def update_loop(self, update_interval: timedelta):
+        async def update_loop(self, update_interval: dt.timedelta):
             """Endless loop for updating the heat pump parameter values."""
             while True:
                 _LOGGER.info("<<< [ UPDATE (every %s) ] >>>", update_interval)
@@ -147,11 +166,11 @@ class HtPublisher:
         return None
 
     def _create_cyclic_sending_task(
-        self, cyclic_sending_interval: timedelta
+        self, cyclic_sending_interval: dt.timedelta
     ) -> Optional[asyncio.Task]:
         """Create an asyncio.Task for sending the heat pump parameter values periodically to the KNX bus."""
 
-        async def cyclic_sending_loop(self, cyclic_sending_interval: timedelta):
+        async def cyclic_sending_loop(self, cyclic_sending_interval: dt.timedelta):
             """Endless loop for sending the heat pump parameter values to the KNX bus."""
             while True:
                 _LOGGER.info(
@@ -177,6 +196,48 @@ class HtPublisher:
                 cyclic_sending_loop(
                     self, cyclic_sending_interval=cyclic_sending_interval
                 )
+            )
+        return None
+
+    def _create_synchronize_clock_callback(
+        self, synchronize_clock_weekly: Optional[Dict]
+    ) -> Optional[asyncio.TimerHandle]:
+        """Create a callback to synchronize the clock of the heat pump."""
+
+        async def synchronize_clock_callback(
+            self, synchronize_clock_weekly: Optional[Dict]
+        ):
+            """Callback function to synchronize the clock of the heat pump."""
+            if dt.datetime.now().weekday() == WEEKDAYS.index(
+                synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_WEEKDAY]
+            ):
+                _LOGGER.info(
+                    "<<< [ SYNCHRONIZE CLOCK (weekly on '%s' at %s) ] >>>",
+                    synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_WEEKDAY],
+                    synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME].strftime(
+                        "%H:%M:%S"
+                    ),
+                )
+                try:
+                    await self._hthp.set_date_time_async()
+                except Exception as ex:
+                    _LOGGER.exception(ex)
+            delay = (
+                synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
+                - dt.datetime.now()
+            ).total_seconds()
+            _synchronize_clock_callback = loop.call_later(
+                delay, synchronize_clock_callback, synchronize_clock_weekly
+            )
+
+        if synchronize_clock_weekly is not None:
+            loop = asyncio.get_event_loop()
+            delay = (
+                synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
+                - dt.datetime.now()
+            ).total_seconds()
+            return loop.call_later(
+                delay, synchronize_clock_callback, synchronize_clock_weekly
             )
         return None
 
