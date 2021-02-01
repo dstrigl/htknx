@@ -208,7 +208,8 @@ class HtPublisher:
             self, synchronize_clock_weekly: Optional[dict]
         ):
             """Callback function to synchronize the clock of the heat pump."""
-            if dt.datetime.now().weekday() == WEEKDAYS.index(
+            now = dt.datetime.now()
+            if now.weekday() == WEEKDAYS.index(
                 synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_WEEKDAY]
             ):
                 _LOGGER.info(
@@ -223,8 +224,10 @@ class HtPublisher:
                 except Exception as ex:
                     _LOGGER.exception(ex)
             delay = (
-                synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
-                - dt.datetime.now().time()
+                dt.datetime.combine(
+                    now.date(), synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
+                )
+                - now
             ).total_seconds()
             self._synchronize_clock_callback = loop.call_later(
                 delay, synchronize_clock_callback, synchronize_clock_weekly
@@ -232,9 +235,12 @@ class HtPublisher:
 
         if synchronize_clock_weekly is not None:
             loop = asyncio.get_event_loop()
+            now = dt.datetime.now()
             delay = (
-                synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
-                - dt.datetime.now().time()
+                dt.datetime.combine(
+                    now.date(), synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
+                )
+                - now
             ).total_seconds()
             return loop.call_later(
                 delay, synchronize_clock_callback, synchronize_clock_weekly
