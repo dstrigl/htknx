@@ -27,7 +27,7 @@ import os
 import sys
 import textwrap
 import datetime as dt
-from typing import Dict, Optional, Type
+from typing import Any, Dict, Optional, Type
 
 from htheatpump import AioHtHeatpump
 from xknx import XKNX
@@ -59,7 +59,7 @@ class HtPublisher:
         notifications: Dict[str, Type[Notification]],
         update_interval: dt.timedelta,
         cyclic_sending_interval: dt.timedelta,
-        synchronize_clock_weekly: Optional[dict],
+        synchronize_clock_weekly: Optional[Dict[str, Any]],
     ):
         """Initialize the HtPublisher class."""
         self._hthp = hthp
@@ -71,7 +71,7 @@ class HtPublisher:
         self._login_task: Optional[asyncio.Task] = None
         self._update_task: Optional[asyncio.Task] = None
         self._cyclic_sending_task: Optional[asyncio.Task] = None
-        self._synchronize_clock_callback: Optional[asyncio.TimerHandle] = None
+        self._synchronize_clock_task: Optional[asyncio.Task] = None
 
     def __del__(self):
         """Destructor, cleaning up if this was not done before."""
@@ -87,8 +87,8 @@ class HtPublisher:
             self._cyclic_sending_task = self._create_cyclic_sending_task(
                 self._cyclic_sending_interval
             )
-        if self._synchronize_clock_callback is None:
-            self._synchronize_clock_callback = self._create_synchronize_clock_callback(
+        if self._synchronize_clock_task is None:
+            self._synchronize_clock_task = self._create_synchronize_clock_task(
                 self._synchronize_clock_weekly
             )
 
@@ -103,9 +103,9 @@ class HtPublisher:
         if self._cyclic_sending_task is not None:
             self._cyclic_sending_task.cancel()
             self._cyclic_sending_task = None
-        if self._synchronize_clock_callback is not None:
-            self._synchronize_clock_callback.cancel()
-            self._synchronize_clock_callback = None
+        if self._synchronize_clock_task is not None:
+            self._synchronize_clock_task.cancel()
+            self._synchronize_clock_task = None
 
     def __enter__(self) -> "HtPublisher":
         """Start the HtPublisher from context manager."""
@@ -199,17 +199,16 @@ class HtPublisher:
             )
         return None
 
-    def _create_synchronize_clock_callback(
-        self, synchronize_clock_weekly: Optional[dict]
-    ) -> Optional[asyncio.TimerHandle]:
-        """Create a callback to synchronize the clock of the heat pump."""
+    def _create_synchronize_clock_task(
+        self, synchronize_clock_weekly: Optional[Dict[str, Any]]
+    ) -> Optional[asyncio.Task]:
+        """Create an asyncio.Task to synchronize the clock of the heat pump regularly."""
 
-        async def synchronize_clock_callback(self, synchronize_clock_weekly: dict):
-            """Callback function to synchronize the clock of the heat pump."""
-            now = dt.datetime.now()
-            if now.weekday() == WEEKDAYS.index(
-                synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_WEEKDAY]
-            ):
+        async def synchronize_clock_loop(
+            self, synchronize_clock_weekly: Dict[str, Any]
+        ):
+            """Endless loop to synchronize the clock of the heat pump regularly."""
+            while True:
                 _LOGGER.info(
                     "<<< [ SYNCHRONIZE CLOCK (weekly on '%s' at %s) ] >>>",
                     synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_WEEKDAY],
@@ -221,27 +220,15 @@ class HtPublisher:
                     await self._hthp.set_date_time_async()
                 except Exception as ex:
                     _LOGGER.exception(ex)
-            delay = (
-                dt.datetime.combine(
-                    now.date(), synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
-                )
-                - now
-            ).total_seconds()
-            self._synchronize_clock_callback = loop.call_later(
-                delay, synchronize_clock_callback, self, synchronize_clock_weekly
-            )
+                # wait until next run
+                await asyncio.sleep(30)  # TODO
 
         if synchronize_clock_weekly is not None:
             loop = asyncio.get_event_loop()
-            now = dt.datetime.now()
-            delay = (
-                dt.datetime.combine(
-                    now.date(), synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
+            return loop.create_task(
+                synchronize_clock_loop(
+                    self, synchronize_clock_weekly=synchronize_clock_weekly
                 )
-                - now
-            ).total_seconds()
-            return loop.call_later(
-                delay, synchronize_clock_callback, self, synchronize_clock_weekly
             )
         return None
 
