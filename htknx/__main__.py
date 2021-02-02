@@ -208,20 +208,28 @@ class HtPublisher:
             self, synchronize_clock_weekly: Dict[str, Any]
         ):
             """Endless loop to synchronize the clock of the heat pump regularly."""
+            sync_weekday = synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_WEEKDAY]
+            sync_time = synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME]
             while True:
-                _LOGGER.info(
-                    "<<< [ SYNCHRONIZE CLOCK (weekly on '%s' at %s) ] >>>",
-                    synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_WEEKDAY],
-                    synchronize_clock_weekly[CONF_SYNCHRONIZE_CLOCK_TIME].strftime(
-                        "%H:%M:%S"
-                    ),
-                )
-                try:
-                    await self._hthp.set_date_time_async()
-                except Exception as ex:
-                    _LOGGER.exception(ex)
-                # wait until next run
-                await asyncio.sleep(30)  # TODO
+                # wait for the next run (once a day)
+                now = dt.datetime.now()
+                delay = dt.datetime.combine(now.date(), sync_time) - now
+                if delay.total_seconds() < 0:
+                    delay += dt.timedelta(days=1)
+                await asyncio.sleep(delay.total_seconds())
+
+                # synchronize the clock only on the defined weekday
+                if now.weekday() == WEEKDAYS.index(sync_weekday):
+                    _LOGGER.info(
+                        "<<< [ SYNCHRONIZE CLOCK (weekly on '%s' at %s) ] >>>",
+                        sync_weekday,
+                        sync_time.strftime("%H:%M:%S"),
+                    )
+                    try:
+                        # set the current date and time of the heat pump
+                        await self._hthp.set_date_time_async()
+                    except Exception as ex:
+                        _LOGGER.exception(ex)
 
         if synchronize_clock_weekly is not None:
             loop = asyncio.get_event_loop()

@@ -141,7 +141,7 @@ time_interval = vol.All(time_period, timedelta_greater_zero)
 
 
 def parse_time(time_str: str) -> Optional[dt_time]:
-    """Parse a time string (e.g. '00:20:00') into Time object.
+    """Parse a time string (e.g. '23:20:11') into Time object.
 
     Return None if invalid.
     """
