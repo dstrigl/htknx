@@ -8,7 +8,7 @@ general:
   cyclic_sending_interval:
     minutes: 1
   synchronize_clock_weekly:
-    weekday: tue
+    weekday: tue  # mon, tue, wed, thu, fri, sat, sun
     time: '13:05'
 
 heat_pump:

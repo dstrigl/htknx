@@ -7,6 +7,9 @@ general:
     seconds: 30
   cyclic_sending_interval:
     minutes: 5
+  synchronize_clock_weekly:
+    weekday: tue  # mon, tue, wed, thu, fri, sat, sun
+    time: '13:05'
 
 heat_pump:
   device: /dev/ttyUSB0

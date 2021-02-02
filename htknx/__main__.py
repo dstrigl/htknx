@@ -227,7 +227,8 @@ class HtPublisher:
                     )
                     try:
                         # set the current date and time of the heat pump
-                        await self._hthp.set_date_time_async()
+                        hthp_dt, _ = await self._hthp.set_date_time_async()
+                        _LOGGER.debug(hthp_dt.isoformat())
                     except Exception as ex:
                         _LOGGER.exception(ex)
 

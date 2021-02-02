@@ -92,9 +92,7 @@ GENERAL_SCHEMA = vol.Schema(
         vol.Optional(
             CONF_CYCLIC_SENDING_INTERVAL, default=DEFAULT_CYCLIC_SENDING_INTERVAL
         ): cv.time_interval,
-        vol.Optional(
-            CONF_SYNCHRONIZE_CLOCK_WEEKLY, default=None
-        ): SYNCHRONIZE_CLOCK_WEEKLY_SCHEMA,
+        vol.Optional(CONF_SYNCHRONIZE_CLOCK_WEEKLY): SYNCHRONIZE_CLOCK_WEEKLY_SCHEMA,
     }
 )
 
