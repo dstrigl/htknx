@@ -131,7 +131,7 @@ The configuration file can contain the following five sections:
 
     * `update_interval` the update interval to refresh the heat pump parameters (optional, default: `60` seconds)
     * `cyclic_sending_interval` the time interval for data points that are to be sent cyclically to the KNX bus (optional, default: `10` minutes)
-    * `synchronize_clock_weekly` to define the day of the week and the time for synchronizing the heat pump clock (optional, default: `null` which means disabled)
+    * `synchronize_clock_weekly` to define the day of the week (`mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun`) and the time (e.g. `'19:55'`) to synchronize the heat pump clock regularly (optional, default: disabled)
 
 * The `heat_pump` section is needed to specify the connection to the heat pump:
 
