@@ -21,12 +21,12 @@
 
 import argparse
 import asyncio
+import datetime as dt
 import logging
 import logging.config
 import os
 import sys
 import textwrap
-import datetime as dt
 from typing import Any, Dict, Optional, Type
 
 from htheatpump import AioHtHeatpump
@@ -34,11 +34,7 @@ from xknx import XKNX
 from xknx.devices import Notification
 
 from .__version__ import __version__
-from .config import (
-    Config,
-    CONF_SYNCHRONIZE_CLOCK_WEEKDAY,
-    CONF_SYNCHRONIZE_CLOCK_TIME,
-)
+from .config import CONF_SYNCHRONIZE_CLOCK_TIME, CONF_SYNCHRONIZE_CLOCK_WEEKDAY, Config
 from .config_validation import WEEKDAYS
 from .htdatapoint import HtDataPoint
 from .htfaultnotification import HtFaultNotification

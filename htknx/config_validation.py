@@ -19,8 +19,8 @@
 
 """ Helpers for config validation using voluptuous. """
 
-from datetime import time as dt_time, timedelta
-
+from datetime import time as dt_time
+from datetime import timedelta
 from numbers import Number
 from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
 
