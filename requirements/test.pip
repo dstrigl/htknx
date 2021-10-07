@@ -1,6 +1,6 @@
 mypy==0.910
 types-PyYAML==5.4.8
-coverage==6.0
+coverage==6.0.1
 pytest==6.2.5
 pytest-mypy==0.8.1
 pytest-cov==3.0.0
