@@ -1,7 +1,7 @@
 mypy==0.931
 types-PyYAML==6.0.4
 coverage==6.3.1
-pytest==7.0.0
+pytest==7.0.1
 pytest-mypy==0.9.1
 pytest-cov==3.0.0
 pytest-sugar==0.9.4
