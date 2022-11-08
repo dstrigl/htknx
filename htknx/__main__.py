@@ -374,7 +374,7 @@ async def main_async() -> None:
     sys.exit(0)
 
 
-def main():
+def main() -> None:
     # run the async main application
     asyncio.run(main_async())
 
