@@ -238,7 +238,7 @@ class HtPublisher:
         return None
 
 
-async def main_async():
+async def main_async() -> None:
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(
             """\
@@ -374,7 +374,7 @@ async def main_async():
     sys.exit(0)
 
 
-def main():
+def main() -> None:
     # run the async main application
     asyncio.run(main_async())
 
